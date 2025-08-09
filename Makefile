@@ -1,6 +1,6 @@
-NAME := polishedcrystal
+NAME := snowcrystal
 MODIFIERS :=
-VERSION := 3.2.0
+VERSION := 0.0.1
 
 ROM_NAME = $(NAME)$(MODIFIERS)-$(VERSION)
 EXTENSION := gbc
