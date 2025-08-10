@@ -1377,18 +1377,18 @@
 	; morn
 	wildmon 3, LEDYBA
 	wildmon 3, TEDDIURSA
-	wildmon 4, TEDDIURSA
+	wildmon 4, STANTLER
 	wildmon 4, PIDGEY
 	wildmon 3, POLIWAG
-	wildmon 4, STANTLER
+	wildmon 4, TEDDIURSA
 	wildmon 4, STANTLER
 	; day
 	wildmon 3, PIDGEY
 	wildmon 3, TEDDIURSA
-	wildmon 4, TEDDIURSA
+	wildmon 4, STANTLER
 	wildmon 4, PIDGEY
 	wildmon 3, LEDYBA
-	wildmon 4, STANTLER
+	wildmon 4, TEDDIURSA
 	wildmon 4, STANTLER
 	; nite
 	wildmon 3, TEDDIURSA
