@@ -1380,16 +1380,16 @@
 	wildmon 4, TEDDIURSA
 	wildmon 4, PIDGEY
 	wildmon 3, POLIWAG
-	wildmon 4, HOPPIP
-	wildmon 4, HOPPIP
+	wildmon 4, STANTLER
+	wildmon 4, STANTLER
 	; day
 	wildmon 3, PIDGEY
 	wildmon 3, TEDDIURSA
 	wildmon 4, TEDDIURSA
 	wildmon 4, PIDGEY
 	wildmon 3, LEDYBA
-	wildmon 4, HOPPIP
-	wildmon 4, HOPPIP
+	wildmon 4, STANTLER
+	wildmon 4, STANTLER
 	; nite
 	wildmon 3, TEDDIURSA
 	wildmon 3, HOOTHOOT
@@ -1408,16 +1408,16 @@
 	wildmon 5, BELLSPROUT
 	wildmon 5, PIDGEY
 	wildmon 4, TEDDIURSA
-	wildmon 5, HOPPIP
-	wildmon 5, HOPPIP
+	wildmon 5, STANTLER
+	wildmon 5, STANTLER
 	; day
 	wildmon 4, PIDGEY
 	wildmon 4, TEDDIURSA
 	wildmon 5, BELLSPROUT
 	wildmon 5, PIDGEY
 	wildmon 4, TEDDIURSA
-	wildmon 5, HOPPIP
-	wildmon 5, HOPPIP
+	wildmon 5, STANTLER
+	wildmon 5, STANTLER
 	; nite
 	wildmon 4, TEDDIURSA
 	wildmon 4, POLIWAG
