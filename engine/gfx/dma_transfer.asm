@@ -50,17 +50,21 @@ ReloadMapPart::
 
 HDMATransferToWRAMBank3:
 	ld a, h
-	ldh [rVDMA_SRC_HIGH], a
+	ldh [rHDMA1], a
 	ld a, l
-	ldh [rVDMA_SRC_LOW], a
+	ldh [rHDMA2], a
 	ldh a, [hBGMapAddress + 1]
 	and $1f
-	ldh [rVDMA_DEST_HIGH], a
+	ldh [rHDMA3], a
 	ldh a, [hBGMapAddress]
-	ldh [rVDMA_DEST_LOW], a
+	ldh [rHDMA4], a
+
 	ld a, $23
 	ldh [hDMATransfer], a
-	jr .handleLoop
+	; fallthrough
+
+WaitDMATransfer:
+	jr .handleLoop ; no-optimize stub jump
 .loop
 	call DelayFrame
 .handleLoop
@@ -79,10 +83,10 @@ StackCallInSafeGFXMode:
 	xor a
 	ldh [hBGMapMode], a
 	ldh [hMapAnims], a
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wScratchTileMap)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ldh a, [rVBK]
 	push af
 
@@ -91,7 +95,7 @@ StackCallInSafeGFXMode:
 	pop af
 	ldh [rVBK], a
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	pop af
 	ldh [hMapAnims], a
 	pop af
@@ -105,16 +109,16 @@ DoHBlankHDMATransfer_toBGMap:
 	ld e, a
 	ld c, $23
 	ld a, h
-	ldh [rVDMA_SRC_HIGH], a
+	ldh [rHDMA1], a
 	ld a, l
 	and $f0
-	ldh [rVDMA_SRC_LOW], a
+	ldh [rHDMA2], a
 	ld a, d
 	and $1f
-	ldh [rVDMA_DEST_HIGH], a
+	ldh [rHDMA3], a
 	ld a, e
 	and $f0
-	ldh [rVDMA_DEST_LOW], a
+	ldh [rHDMA4], a
 	di
 	ldh a, [rLY]
 	add c ; calculate end LY
@@ -123,9 +127,9 @@ DoHBlankHDMATransfer_toBGMap:
 	set 7, c
 .waitHBlank
 	ldh a, [rSTAT]
-	and STAT_MODE
+	and rSTAT_MODE_MASK
 	jr nz, .waitHBlank
-	ld hl, rVDMA_LEN
+	ld hl, rHDMA5
 	ld [hl], c
 	ld a, $ff
 .waitHDMALoop
@@ -136,19 +140,19 @@ DoHBlankHDMATransfer_toBGMap:
 DoHBlankHDMATransfer:
 	ld b, $7f
 ; a lot of waiting around for hardware registers
-	; [rVDMA_SRC_HIGH, rVDMA_SRC_LOW] = hl & $fff0
+	; [rHDMA1, rHDMA2] = hl & $fff0
 	ld a, h
-	ldh [rVDMA_SRC_HIGH], a
+	ldh [rHDMA1], a
 	ld a, l
 	and $f0 ; high nybble
-	ldh [rVDMA_SRC_LOW], a
-	; [rVDMA_DEST_HIGH, rVDMA_DEST_LOW] = de & $1ff0
+	ldh [rHDMA2], a
+	; [rHDMA3, rHDMA4] = de & $1ff0
 	ld a, d
 	and $1f ; lower 5 bits
-	ldh [rVDMA_DEST_HIGH], a
+	ldh [rHDMA3], a
 	ld a, e
 	and $f0 ; high nybble
-	ldh [rVDMA_DEST_LOW], a
+	ldh [rHDMA4], a
 	; e = c | %10000000
 	dec c ; c = number of LYs needed
 	ld e, c
@@ -158,7 +162,7 @@ DoHBlankHDMATransfer:
 	cp b ; is the end LY greater than the max LY
 	call nc, DI_DelayFrame ; if so, delay a frame to reset the LY
 
-	lb bc, STAT_MODE, LOW(rSTAT)
+	lb bc, rSTAT_MODE_MASK, LOW(rSTAT)
 .noHBlankWait
 	ldh a, [c]
 	and b
@@ -167,7 +171,7 @@ DoHBlankHDMATransfer:
 	ldh a, [c]
 	and b
 	jr nz, .hBlankWaitLoop
-	ld hl, rVDMA_LEN
+	ld hl, rHDMA5
 	ld [hl], e
 	ld a, $ff
 .waitForHDMA
@@ -176,7 +180,7 @@ DoHBlankHDMATransfer:
 	ret
 
 CutAndPasteTilemap:
-	ld c, ' '
+	ld c, " "
 	jr CutAndPasteMap
 
 CutAndPasteAttrMap:

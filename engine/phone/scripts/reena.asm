@@ -1,5 +1,5 @@
 ReenaPhoneScript1:
-	gettrainername COOLTRAINERF, REENA1, STRING_BUFFER_3
+	gettrainername COOLTRAINERF, REENA1, $0
 	checkflag ENGINE_REENA_READY_FOR_REMATCH
 	iftruefwd .WantsBattle
 	farscall PhoneScript_AnswerPhone_Female
@@ -14,11 +14,11 @@ ReenaPhoneScript1:
 	farsjump ReenaForwardScript
 
 .WantsBattle:
-	getlandmarkname ROUTE_27, STRING_BUFFER_5
+	getlandmarkname ROUTE_27, $2
 	farsjump ReenaHurryScript
 
 ReenaPhoneScript2:
-	gettrainername COOLTRAINERF, REENA1, STRING_BUFFER_3
+	gettrainername COOLTRAINERF, REENA1, $0
 	farscall PhoneScript_GreetPhone_Female
 	checkflag ENGINE_REENA_READY_FOR_REMATCH
 	iftruefwd .Generic
@@ -34,6 +34,6 @@ ReenaSundayMorning:
 	setflag ENGINE_REENA_SUNDAY_MORNING
 
 ReenaWantsBattle:
-	getlandmarkname ROUTE_27, STRING_BUFFER_5
+	getlandmarkname ROUTE_27, $2
 	setflag ENGINE_REENA_READY_FOR_REMATCH
 	farsjump PhoneScript_WantsToBattle_Female

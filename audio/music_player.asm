@@ -70,11 +70,11 @@ MusicPlayer::
 
 ; Load palette
 	ld hl, rIE
-	set B_IE_STAT, [hl]
-	ldh a, [rWBK]
+	set LCD_STAT, [hl]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wBGPals2)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	ld hl, MusicPlayerPals
 	ld de, wBGPals2
@@ -87,12 +87,12 @@ MusicPlayer::
 	rst CopyBytes
 
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 ; Apply palettes
 	xor a
 	hlcoord 0, 0, wAttrmap
-	ld bc, SCREEN_AREA
+	ld bc, SCREEN_WIDTH * SCREEN_HEIGHT
 	rst ByteFill
 	hlcoord 3, MP_HUD_TOP + 2, wAttrmap
 	ld [hl], $3
@@ -126,7 +126,7 @@ MusicPlayer::
 	call DelayFrame
 
 	ld hl, rLCDC
-	set B_LCDC_ENABLE, [hl]
+	set rLCDC_ENABLE, [hl]
 	ei
 
 	call ClearSprites
@@ -138,10 +138,10 @@ MusicPlayer::
 	rst ByteFill
 
 ; Clear wMPNotes
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wMPNotes)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	xor a
 	ld hl, wMPNotes
@@ -149,7 +149,7 @@ MusicPlayer::
 	rst ByteFill
 
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 ; fallthrough
 
 RenderMusicPlayer:
@@ -169,7 +169,7 @@ RenderMusicPlayer:
 	call RedrawChannelLabels
 	call DelayFrame
 
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	ldh [hMPBuffer], a
 
 	ld a, [wSongSelection]
@@ -191,19 +191,19 @@ _RedrawMusicPlayer:
 
 MusicPlayerLoop:
 	ld a, BANK(wMPNotes)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	call MPUpdateUIAndGetJoypad
 	ld hl, hJoyDown
-	jrheldbutton PAD_UP, .up, 12
-	jrheldbutton PAD_DOWN, .down, 12
-	jrheldbutton PAD_LEFT, .left, 12
-	jrheldbutton PAD_RIGHT, .right, 12
+	jrheldbutton D_UP, .up, 12
+	jrheldbutton D_DOWN, .down, 12
+	jrheldbutton D_LEFT, .left, 12
+	jrheldbutton D_RIGHT, .right, 12
 	ld hl, hJoyPressed
-	jrbutton PAD_A, .a
-	jrbutton PAD_B, .b
-	jrbutton PAD_START, .start
-	jpbutton PAD_SELECT, .select
+	jrbutton A_BUTTON, .a
+	jrbutton B_BUTTON, .b
+	jrbutton START, .start
+	jpbutton SELECT, .select
 
 	; prioritize refreshing the note display
 	ld a, 2
@@ -271,12 +271,12 @@ MusicPlayerLoop:
 	ldh [hMPState], a
 	ldh [hVBlank], a
 	ldh a, [hMPBuffer]
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	call ClearSprites
 	ld hl, rLCDC
-	res B_LCDC_OBJ_SIZE, [hl]
+	res rLCDC_SPRITE_SIZE, [hl]
 	ld hl, rIE
-	res B_IE_STAT, [hl]
+	res LCD_STAT, [hl]
 
 	ld a, LOW(LCDGeneric)
 	ldh [hFunctionTargetLo], a
@@ -289,7 +289,7 @@ MusicPlayerLoop:
 	xor a
 	ldh [hMPState], a
 	ldh a, [hMPBuffer]
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	call SongSelector
 	jmp RenderMusicPlayer
 
@@ -297,21 +297,21 @@ MusicPlayerLoop:
 	xor a
 	ld [wChannelSelector], a
 	hlcoord 3, MP_HUD_TOP
-	ld [hl], '◀'
+	ld [hl], "◀"
 ; fallthrough
 
 SongEditor:
 	call MPUpdateUIAndGetJoypad
 	ld hl, hJoyDown
-	jpheldbutton PAD_UP, .up, 10
-	jpheldbutton PAD_DOWN, .down, 10
+	jpheldbutton D_UP, .up, 10
+	jpheldbutton D_DOWN, .down, 10
 	ld hl, hJoyPressed
-	jrbutton PAD_LEFT, .left
-	jrbutton PAD_RIGHT, .right
-	jrbutton PAD_A, .a
-	jpbutton PAD_B, .b
-	jpbutton PAD_START, .start
-	jpbutton PAD_SELECT, .select
+	jrbutton D_LEFT, .left
+	jrbutton D_RIGHT, .right
+	jrbutton A_BUTTON, .a
+	jpbutton B_BUTTON, .b
+	jpbutton START, .start
+	jpbutton SELECT, .select
 
 	; prioritize refreshing the note display
 	ld a, 2
@@ -558,14 +558,14 @@ AdjustTempo:
 .loop:
 	call MPUpdateUIAndGetJoypad
 	ld hl, hJoyDown
-	jrheldbutton PAD_UP, .up, 6
-	jrheldbutton PAD_DOWN, .down, 6
-	jrheldbutton PAD_RIGHT, .right, 18
-	jrheldbutton PAD_LEFT, .left, 18
+	jrheldbutton D_UP, .up, 6
+	jrheldbutton D_DOWN, .down, 6
+	jrheldbutton D_RIGHT, .right, 18
+	jrheldbutton D_LEFT, .left, 18
 	ld hl, hJoyPressed
-	jrbutton PAD_A, .a
-	jrbutton PAD_B, .b
-	jrbutton PAD_START, .start
+	jrbutton A_BUTTON, .a
+	jrbutton B_BUTTON, .b
+	jrbutton START, .start
 
 	; prioritize refreshing the note display
 	ld a, 2
@@ -659,7 +659,7 @@ DrawPianoRollOverlay:
 	ld a, 2
 	ldh [hVBlank], a
 
-	ld a, ' '
+	ld a, " "
 	hlcoord 0, 0
 	ld bc, SCREEN_WIDTH * PIANO_ROLL_HEIGHT
 	rst ByteFill
@@ -686,7 +686,7 @@ DrawPitchTransposition:
 	and a
 	ret z
 .continue
-	ld [hl], 'P' ; no-optimize *hl++|*hl-- = N
+	ld [hl], "P" ; no-optimize *hl++|*hl-- = N
 	inc hl
 	lb bc, PRINTNUM_LEFTALIGN | 1, 2
 	ld de, wPitchTransposition
@@ -703,21 +703,21 @@ DrawTempoAdjustment:
 	and a
 	ret z
 .continue
-	ld [hl], 'T' ; no-optimize *hl++|*hl-- = N
+	ld [hl], "T" ; no-optimize *hl++|*hl-- = N
 	inc hl
 	lb bc, PRINTNUM_LEFTALIGN | 1, 3
 	ld de, wTempoAdjustment
 _PrintSignedNum:
 	bit 7, a
 	jr nz, .negative
-	ld a, '+'
+	ld a, "+"
 	jr .printnum
 .negative
 	cpl
 	inc a
 	ld de, wTmpValue
 	ld [de], a
-	ld a, '-'
+	ld a, "-"
 .printnum
 	ld [hli], a
 	jmp PrintNum
@@ -735,7 +735,7 @@ DrawChannelSelector:
 	cp MP_EDIT_TEMPO
 	jr z, .tempo
 	call _LocateChannelSelector
-	ld [hl], '◀'
+	ld [hl], "◀"
 	ret
 
 .pitch:
@@ -746,9 +746,9 @@ DrawChannelSelector:
 .draw
 	ld a, [wAdjustingTempo]
 	and a
-	ld a, '▶'
+	ld a, "▶"
 	jr z, .ok
-	ld a, '▷'
+	ld a, "▷"
 .ok
 	ld [hl], a
 	ret
@@ -770,7 +770,7 @@ ClearChannelSelector:
 .tempo:
 	hlcoord 14, 2
 .clear
-	ld [hl], ' '
+	ld [hl], " "
 	ret
 
 _LocateChannelSelector:
@@ -850,7 +850,7 @@ DrawChData:
 	; channel 4
 	hlcoord 19, MP_HUD_TOP + 1
 	ld a, [wMusicNoiseSampleSet]
-	add '0'
+	add "0"
 	ld [hl], a
 
 	hlcoord 17, MP_HUD_TOP + 2
@@ -862,7 +862,7 @@ DrawChData:
 	ld a, MP_METER8
 	jr nz, .got_hit
 .blank_hit
-	ld a, ' '
+	ld a, " "
 .got_hit
 	ld [hl], a
 	xor a
@@ -894,7 +894,7 @@ _DrawCh1_2_3:
 	push hl
 	call GetOctaveAddr
 	ld d, [hl]
-	ld a, '8'
+	ld a, "8"
 	sub d
 	pop hl
 	ld [hli], a
@@ -954,10 +954,10 @@ _DrawCh1_2_3:
 
 	ld a, [wChannel3Intensity]
 	and $f
-	add '0'
-	cp '9' + 1
+	add "0"
+	cp "9" + 1
 	jr c, .got_digit
-	sub '9' + 1 - 'A'
+	sub "9" + 1 - "A"
 .got_digit
 	hlcoord 14, MP_HUD_TOP + 1
 	ld [hl], a
@@ -991,10 +991,10 @@ DrawNotes:
 	call DrawNote
 	call CheckForVolumeBarReset
 
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wMPNotes)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ldh a, [hMPState]
 	inc a
 	ldh [hMPState], a
@@ -1010,7 +1010,7 @@ DrawNotes:
 	add PIANO_ROLL_HEIGHT_PX
 	call nc, .CopyNotes
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ret
 
 .CopyNotes:
@@ -1069,14 +1069,14 @@ CheckChannelOn:
 	ld a, [wTmpCh]
 	cp 2
 	jr nz, .notch3 ; NR32 does something different
-	ldh a, [rAUD3LEVEL]
+	ldh a, [rNR32]
 	and $60
 	jr z, _NoteEnded ; 0% volume
 	jr .still_going
 
 .notch3
 	ld bc, 5
-	ld hl, rAUD1ENV
+	ld hl, rNR12
 	rst AddNTimes
 	ld a, [hl]
 	ld b, a
@@ -1116,6 +1116,7 @@ DrawNote:
 	ld a, [hl]
 	cp b
 	jr z, DrawLongerNote
+DrawChangedNote:
 	ld [hl], b
 	call SetVisualIntensity
 DrawNewNote:
@@ -1330,6 +1331,35 @@ UpdateVisualIntensity:
 	jr z, .next_channel
 	jr .update_channels
 
+AddNoteToOld:
+	push hl
+	ld a, [wNumNoteLines]
+	add a
+	add a
+	ld c, a
+	ld b, 0
+	ld hl, wShadowOAM + 3 * 4
+	add hl, bc
+	push hl
+	pop de
+	pop hl
+rept 3
+	ld a, [hli]
+	ld [de], a
+	inc de
+endr
+	ld a, [hl]
+	ld [de], a
+
+	ld a, [wNumNoteLines]
+	inc a
+	cp $25
+	jr nz, .finish
+	xor a
+.finish
+	ld [wNumNoteLines], a
+	ret
+
 GetPitchAddr:
 	ld hl, wChannel1Pitch
 	jr _GetChannelMemberAddr
@@ -1372,7 +1402,7 @@ GetSongInfo:
 	jr z, .found
 .loop2:
 	ld a, [hli]
-	cp '@'
+	cp "@"
 	jr z, .nextline
 	jr .loop2
 .found
@@ -1431,7 +1461,7 @@ DrawSongInfo:
 	ret
 
 DrawSongID:
-	ld a, '<SHARP>'
+	ld a, "<SHARP>"
 	ld [hli], a
 	ld a, [wSongSelection]
 	cp 10
@@ -1445,7 +1475,7 @@ DrawSongID:
 	jmp PrintNum
 
 .print_digit
-	add '0'
+	add "0"
 	ld [hli], a
 	ret
 
@@ -1478,7 +1508,7 @@ GetSongArtist2:
 	call GetNthString
 	push hl
 	ld a, [hl]
-	cp '@'
+	cp "@"
 	jr z, .finish
 	ld de, .Arranger
 	hlcoord 0, 9
@@ -1492,11 +1522,11 @@ GetSongArtist2:
 
 SongSelector:
 	hlcoord 0, 0
-	ld a, ' '
-	ld bc, SCREEN_AREA
+	ld a, " "
+	ld bc, SCREEN_WIDTH * SCREEN_HEIGHT
 	rst ByteFill
 	ld hl, rLCDC
-	res B_LCDC_OBJS, [hl]
+	res rLCDC_SPRITES_ENABLE, [hl]
 	call ClearSprites
 
 	hlcoord 0, 0
@@ -1504,7 +1534,7 @@ SongSelector:
 	call Textbox
 
 	hlcoord 0, MP_LIST_CURSOR_Y
-	ld [hl], '▶'
+	ld [hl], "▶"
 	ld a, [wSongSelection]
 	ld [wSelectorTop], a ; backup, in case of B button
 	cp MP_LIST_CURSOR_Y
@@ -1519,13 +1549,13 @@ SongSelector:
 	call DelayFrame
 	call MPGetJoypad
 	ld hl, hJoyDown
-	jrheldbutton PAD_UP, .up, 6
-	jrheldbutton PAD_DOWN, .down, 6
-	jrheldbutton PAD_LEFT, .left, 18
-	jrheldbutton PAD_RIGHT, .right, 18
+	jrheldbutton D_UP, .up, 6
+	jrheldbutton D_DOWN, .down, 6
+	jrheldbutton D_LEFT, .left, 18
+	jrheldbutton D_RIGHT, .right, 18
 	ld hl, hJoyPressed
-	jrbutton PAD_A, .a
-	jrbutton PAD_START | PAD_B, .start_b
+	jrbutton A_BUTTON, .a
+	jrbutton START | B_BUTTON, .start_b
 	jr .loop
 
 .a:
@@ -1596,7 +1626,7 @@ SongSelector:
 .finish:
 	ld [wSongSelection], a
 	ld hl, rLCDC
-	set B_LCDC_OBJS, [hl]
+	set rLCDC_SPRITES_ENABLE, [hl]
 	ret
 
 UpdateSelectorNames:
@@ -1648,7 +1678,7 @@ MPGetJoypad:
 
 MPLPlaceString:
 	push hl
-	ld a, ' '
+	ld a, " "
 	ld hl, wStringBuffer2
 	ld bc, 3
 	rst ByteFill
@@ -1658,27 +1688,27 @@ MPLPlaceString:
 	lb bc, 1, 3
 	call PrintNum
 	pop de
-	ld a, ' '
+	ld a, " "
 	ld [hli], a
 	push hl
 	push de
 	rst PlaceString
 	ld h, b
 	ld l, c
-	ld [hl], '@'
+	ld [hl], "@"
 	pop de
 	pop hl
 .de_loop
 	ld a, [de]
 	inc de
-	cp '@'
+	cp "@"
 	jr nz, .de_loop
 	dec de
 	ld bc, 0
 .loop
 	inc c
 	ld a, [hli]
-	cp '@'
+	cp "@"
 	jr nz, .loop
 	ld a, c
 	cp 16
@@ -1688,19 +1718,19 @@ MPLPlaceString:
 	sub c
 	jr z, .ok
 .loop2
-	ld [hl], ' ' ; no-optimize *hl++|*hl-- = N
+	ld [hl], " " ; no-optimize *hl++|*hl-- = N
 	inc hl
 	dec a
 	jr nz, .loop2
-	ld [hl], '@'
+	ld [hl], "@"
 	jr .ok
 .overflow
 	ld bc, 17
 	ld hl, wStringBuffer2
 	add hl, bc
-	ld a, '…'
+	ld a, "…"
 	ld [hli], a
-	ld [hl], '@'
+	ld [hl], "@"
 .ok
 	pop hl
 	push de
@@ -1731,9 +1761,9 @@ ChannelsOffTilemaps:
 
 NoteOAM:
 	; y, x, tile id, OAM attributes
-	db 0, 0, $00, OAM_PRIO | 3 ; red
-	db 0, 0, $00, OAM_PRIO | 2 ; blue
-	db 0, 0, $00, OAM_PRIO | 1 ; green
+	db 0, 0, $00, PRIORITY | 3 ; red
+	db 0, 0, $00, PRIORITY | 2 ; blue
+	db 0, 0, $00, PRIORITY | 1 ; green
 
 INCLUDE "data/music_player/notes.asm"
 INCLUDE "data/music_player/song_info.asm"

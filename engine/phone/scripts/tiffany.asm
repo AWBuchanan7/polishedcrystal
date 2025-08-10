@@ -1,5 +1,5 @@
 TiffanyPhoneScript1:
-	gettrainername PICNICKER, TIFFANY1, STRING_BUFFER_3
+	gettrainername PICNICKER, TIFFANY1, $0
 	checkflag ENGINE_TIFFANY_READY_FOR_REMATCH
 	iftruefwd .WantsBattle
 	farscall PhoneScript_AnswerPhone_Female
@@ -16,15 +16,15 @@ TiffanyPhoneScript1:
 	farsjump TiffanyNoItemScript
 
 .WantsBattle:
-	getlandmarkname ROUTE_43, STRING_BUFFER_5
+	getlandmarkname ROUTE_43, $2
 	farsjump TiffanyAsleepScript
 
 .HasItem:
-	getlandmarkname ROUTE_43, STRING_BUFFER_5
+	getlandmarkname ROUTE_43, $2
 	farsjump TiffanyHurryScript
 
 TiffanyPhoneScript2:
-	gettrainername PICNICKER, TIFFANY1, STRING_BUFFER_3
+	gettrainername PICNICKER, TIFFANY1, $0
 	farscall PhoneScript_Random4
 	ifequalfwd $0, TiffanysFamilyMembers
 	farscall PhoneScript_GreetPhone_Female
@@ -52,7 +52,7 @@ TiffanyTuesdayAfternoon:
 	setflag ENGINE_TIFFANY_TUESDAY_AFTERNOON
 
 TiffanyWantsBattle:
-	getlandmarkname ROUTE_43, STRING_BUFFER_5
+	getlandmarkname ROUTE_43, $2
 	setflag ENGINE_TIFFANY_READY_FOR_REMATCH
 	farsjump PhoneScript_WantsToBattle_Female
 
@@ -66,27 +66,27 @@ TiffanysFamilyMembers:
 	ifequalfwd $5, .Brother
 
 .Grandma:
-	getstring Phone_GrandmaString, STRING_BUFFER_4
+	getstring Phone_GrandmaString, $1
 	sjumpfwd .PoorClefairy
 
 .Grandpa:
-	getstring Phone_GrandpaString, STRING_BUFFER_4
+	getstring Phone_GrandpaString, $1
 	sjumpfwd .PoorClefairy
 
 .Mom:
-	getstring Phone_MomString, STRING_BUFFER_4
+	getstring Phone_MomString, $1
 	sjumpfwd .PoorClefairy
 
 .Dad:
-	getstring Phone_DadString, STRING_BUFFER_4
+	getstring Phone_DadString, $1
 	sjumpfwd .PoorClefairy
 
 .Sister:
-	getstring Phone_SisterString, STRING_BUFFER_4
+	getstring Phone_SisterString, $1
 	sjumpfwd .PoorClefairy
 
 .Brother:
-	getstring Phone_BrotherString, STRING_BUFFER_4
+	getstring Phone_BrotherString, $1
 	; fallthrough
 
 .PoorClefairy:
@@ -94,5 +94,5 @@ TiffanysFamilyMembers:
 
 TiffanyHasPinkBow:
 	setflag ENGINE_TIFFANY_HAS_PINK_BOW
-	getlandmarkname ROUTE_43, STRING_BUFFER_5
+	getlandmarkname ROUTE_43, $2
 	farsjump PhoneScript_FoundItem_Female

@@ -17,10 +17,6 @@ HasNoItems:
 TossItemFromPC:
 	push de
 	call PartyMonItemName
-
-	; Force plural.
-	xor a
-	ld [wItemQuantityChangeBuffer], a
 	ld hl, .TossHowMany
 	call MenuTextbox
 	farcall SelectQuantityToToss
@@ -58,7 +54,7 @@ TossItemFromPC:
 
 .ConfirmToss:
 	; Throw away @ @ (S)?
-	text_far _AskQuantityThrowAwayText
+	text_far _ItemsThrowAwayText
 	text_end
 
 .TossedThisMany:
@@ -118,10 +114,11 @@ PokemonActionSubmenu:
 	dbw MONMENUITEM_HEADBUTT,   MonMenu_Headbutt
 	dbw MONMENUITEM_WATERFALL,  MonMenu_Waterfall
 	dbw MONMENUITEM_ROCKSMASH,  MonMenu_RockSmash
-	dbw MONMENUITEM_SUMMARY,    OpenPartySummary
+	dbw MONMENUITEM_STATS,      OpenPartyStats
 	dbw MONMENUITEM_SWITCH,     SwitchPartyMons
 	dbw MONMENUITEM_ITEM,       GiveTakePartyMonItem
 	dbw MONMENUITEM_CANCEL,     CancelPokemonAction
+	dbw MONMENUITEM_MOVE,       ManagePokemonMoves
 	dbw MONMENUITEM_MAIL,       MonMailAction
 
 SwitchPartyMons:
@@ -138,7 +135,7 @@ SwitchPartyMons:
 	call ApplyTilemapInVBlank
 	call DelayFrame
 
-	ld a, PAD_A | PAD_B | PAD_SELECT
+	ld a, A_BUTTON | B_BUTTON | SELECT
 	ld [wMenuJoypadFilter], a
 
 	farcall PartyMenuSelect
@@ -375,7 +372,7 @@ PCGiveItem:
 SwapPartyItem:
 	ld a, [wPartyCount]
 	cp 2
-	jmp c, .DontSwap
+	jr c, .DontSwap
 	ld a, [wCurPartyMon]
 	inc a
 	ld [wSwitchMon], a
@@ -390,7 +387,7 @@ SwapPartyItem:
 	ld a, [wSwitchMon]
 	dec a
 	rst AddNTimes
-	ld [hl], '▷'
+	ld [hl], "▷"
 	call ApplyTilemapInVBlank
 	call SetDefaultBGPAndOBP
 	call DelayFrame
@@ -407,11 +404,11 @@ SwapPartyItem:
 	; First, swap mail metadata. Don't bother checking if we are holding Mail,
 	; doing the swap either way is harmless and simplifies checks.
 	; Note that wCurPartyMon is 0-indexed while wSwitchMon is 1-indexed.
-	ld a, [wCurPartyMon]
-	ld c, a
 	push bc
 	push de
-	inc c
+	ld a, [wCurPartyMon]
+	inc a
+	ld c, a
 	ld a, [wSwitchMon]
 	ld e, a
 	farcall SwapPartyMonMail
@@ -422,7 +419,7 @@ SwapPartyItem:
 	; wCurPartyMon contains second selected pkmn
 	; getting pkmn2 item and putting into stack item addr + item id
 	call GetPartyItemLocation
-	ld a, [hl] ; a contains pkmn2 item
+	ld a, [hl] ; a pkmn2 contains item
 	push hl
 	push af
 	; getting pkmn 1 item and putting item id into b
@@ -430,30 +427,14 @@ SwapPartyItem:
 	dec a
 	ld [wCurPartyMon], a
 	call GetPartyItemLocation
-	ld a, [hl] ; a contains pkmn1 item
+	ld a, [hl] ; a pkmn1 contains item
 	ld b, a
 	; actual swap
 	pop af
-	ld [hl], a ; pkmn1 get pkmn2 item
-	xor a ; ld a, MON_SPECIES
-	push hl
-	call GetPartyParamLocationAndValue
-	pop hl
-	ld [wCurPartySpecies], a ; load pkmn1 species
-	push bc
-	call UpdateMewtwoForm
-	pop bc
+	ld [hl], a ; pkmn1 get pkm2 item
 	pop hl
 	ld a, b
-	ld [hl], a ; pkmn2 get pkmn1 item
-	ld a, c
-	ld [wCurPartyMon], a ; restore pkmn2
-	xor a ; ld a, MON_SPECIES
-	push hl
-	call GetPartyParamLocationAndValue
-	pop hl
-	ld [wCurPartySpecies], a ; load pkmn2 species
-	call UpdateMewtwoForm
+	ld [hl], a ; pkmn1 get pkm2 item
 	xor a
 	ld [wPartyMenuActionText], a
 	jmp CancelPokemonAction
@@ -639,9 +620,9 @@ MonMailAction:
 	ld a, $3
 	ret c
 	ld a, [wMenuCursorY]
-	dec a ; 1?
+	cp $1
 	jr z, .read
-	dec a ; 2?
+	cp $2
 	jr z, TakeMail
 	ld a, $3
 	ret
@@ -740,22 +721,18 @@ TakeMail:
 	text_far _MailSentToPCText
 	text_end
 
-OpenPartySummary:
-	call OpenTempmonSummary
-	jmp ReturnToMapFromSubmenu
-
-OpenTempmonSummary:
+OpenPartyStats:
 ; Stats screen for partymon in wCurPartyMon.
 	call PreparePartyTempMon
 	; fallthrough
-_OpenTempmonSummary:
+_OpenPartyStats:
 ; Stats screen for any mon, as supplied by wTempMonBox+wTempMonSlot
 	call LoadStandardMenuHeader
 	call ClearSprites
 	call LowVolume
 	ld a, TEMPMON
 	ld [wMonType], a
-	predef SummaryScreenInit
+	predef StatsScreenInit
 	; check if the cry is still playing
 	call CheckSFX
 	ld a, MAX_VOLUME
@@ -772,7 +749,7 @@ MonMenu_Cut:
 	farcall CutFunction
 _MonMenu_StandardCheck:
 	ld a, [wFieldMoveSucceeded]
-	dec a
+	cp $1
 	jr nz, _MonMenu_StandardFail
 _MonMenu_StandardSuccess:
 	ld b, $4
@@ -988,6 +965,33 @@ PreparePartyTempMon:
 	ld a, [wCurPartyMon]
 	inc a
 	ld [wTempMonSlot], a
+	ret
+
+ManagePokemonMoves:
+	call PreparePartyTempMon
+	; fallthrough
+_ManagePokemonMoves:
+	ld a, [wTempMonBox]
+	ld b, a
+	ld a, [wTempMonSlot]
+	ld c, a
+	farcall GetStorageBoxMon
+	ld hl, wTempMonIsEgg
+	bit MON_IS_EGG_F, [hl]
+	jr nz, .egg
+	ld hl, wOptions1
+	ld a, [hl]
+	push af
+	set NO_TEXT_SCROLL, [hl]
+	xor a
+	ld [wMoveScreenMode], a
+	call MoveScreenLoop
+	pop af
+	ld [wOptions1], a
+	call ClearBGPalettes
+
+.egg
+	xor a
 	ret
 
 MoveScreen:
@@ -1558,14 +1562,14 @@ MoveScreen_ListMovesFast:
 .cursor_loop
 	inc a
 	add hl, bc
-	ld [hl], ' '
+	ld [hl], " "
 	cp d
 	jr nz, .not_selected_swap
-	ld [hl], '▷'
+	ld [hl], "▷"
 .not_selected_swap
 	cp e
 	jr nz, .not_selected
-	ld [hl], '▶'
+	ld [hl], "▶"
 .not_selected
 	cp NUM_MOVES
 	jr nz, .cursor_loop
@@ -1573,7 +1577,7 @@ MoveScreen_ListMovesFast:
 	and a
 	jr z, .skip_up
 	hlcoord 18, 2
-	ld [hl], '▲'
+	ld [hl], "▲"
 .skip_up
 	ld a, [wMoveScreenOffset]
 	ld b, a
@@ -1582,7 +1586,7 @@ MoveScreen_ListMovesFast:
 	sub 5
 	jr c, .skip_down
 	hlcoord 18, 10
-	ld [hl], '▼'
+	ld [hl], "▼"
 .skip_down
 	ld a, [wMoveSwapBuffer]
 	and a
@@ -1629,7 +1633,7 @@ MoveScreen_ListMovesFast:
 
 	pop af
 	ld hl, TypeIconGFX
-	ld bc, 4 * TILE_1BPP_SIZE
+	ld bc, 4 * LEN_1BPP_TILE
 	rst AddNTimes
 	ld d, h
 	ld e, l

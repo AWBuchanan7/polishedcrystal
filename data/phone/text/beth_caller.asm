@@ -20,6 +20,7 @@ BethDefeatedMonText:
 	text "Oh, have you ever"
 	line "seen a "
 	text_ram wStringBuffer4
+	text ""
 	cont "before?"
 
 	para "I just battled"

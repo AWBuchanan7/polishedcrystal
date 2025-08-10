@@ -120,8 +120,6 @@ BT_SwapRentals:
 .reset_switch
 	xor a
 	ld [wSwitchMon], a
-	call LoadPartyMenuGFX
-	call SetDefaultBGPAndOBP
 	jmp .loop
 
 .improper_swap
@@ -214,7 +212,9 @@ BT_PartySelect:
 	dec a ; Enter
 	jr z, .Enter
 	dec a ; Stats
-	jr z, .Stats
+	jmp z, .Stats
+	dec a ; Moves
+	jmp z, .Moves
 	jr .loop ; Cancel
 
 .return
@@ -226,7 +226,7 @@ BT_PartySelect:
 	ld a, MON_IS_EGG
 	call GetPartyParamLocationAndValue
 	bit MON_IS_EGG_F, a
-	ld hl, .BannedMenuHeader
+	ld hl, .EggMenuHeader
 	jmp nz, BT_DisplayMenu
 
 	; Check if mon is banned
@@ -281,35 +281,57 @@ BT_PartySelect:
 	prompt
 
 .Stats:
-	farcall OpenPartySummary
+	farcall OpenPartyStats
 	jmp .loop
+
+.Moves:
+	; For Eggs, "Moves" is actually the "Cancel" option
+	ld a, MON_IS_EGG
+	call GetPartyParamLocationAndValue
+	bit MON_IS_EGG_F, a
+	jr nz, .Cancel
+	farcall ManagePokemonMoves
 
 .Cancel:
 	jmp .loop
 
+.EggMenuHeader:
+	db $00 ; flags
+	menu_coords 11, 13, 19, 17
+	dw .EggMenuData
+	db 1 ; default option
+
+.EggMenuData:
+	db $c0 ; flags
+	db 2 ; items
+	db "Stats@"
+	db "Cancel@"
+
 .MenuHeader:
 	db $00 ; flags
-	menu_coords 10, 11, 19, 17
+	menu_coords 11, 9, 19, 17
 	dw .MenuData
 	db 1 ; default option
 
 .MenuData:
 	db $c0 ; flags
-	db 3 ; items
+	db 4 ; items
 	db "Enter@"
-	db "Summary@"
+	db "Stats@"
+	db "Moves@"
 	db "Cancel@"
 
 .BannedMenuHeader:
 	db $00 ; flags
-	menu_coords 10, 13, 19, 17
+	menu_coords 11, 11, 19, 17
 	dw .BannedMenuData
 	db 1 ; default option
 
 .BannedMenuData:
 	db $c0 ; flags
-	db 2 ; items
-	db "Summary@"
+	db 3 ; items
+	db "Stats@"
+	db "Moves@"
 	db "Cancel@"
 
 BTText_EnterBattle:
@@ -327,8 +349,6 @@ BTText_SameItem:
 	prompt
 
 BT_ConfirmPartySelection:
-	call LoadPartyMenuGFX
-	call SetDefaultBGPAndOBP
 	call InitPartyMenuLayout
 	farcall FreezeMonIcons
 	hlcoord 1, 16
@@ -373,7 +393,7 @@ BT_DisplayMenu:
 	call PlaySFX
 	ldh a, [hJoyPressed]
 	and a ; clear carry
-	bit B_PAD_B, a
+	bit B_BUTTON_F, a
 	ret z
 	scf
 	ret
@@ -524,8 +544,8 @@ WritePartyMenuTilemap:
 	xor a
 	ldh [hBGMapMode], a
 	hlcoord 0, 0
-	ld bc, SCREEN_AREA
-	ld a, ' '
+	ld bc, SCREEN_WIDTH * SCREEN_HEIGHT
+	ld a, " "
 	rst ByteFill ; blank the tilemap
 	call GetPartyMenuTilemapPointers ; This reads from a pointer table???
 .loop
@@ -613,7 +633,8 @@ PlacePartyHPBar:
 	ld b, $0
 	add hl, bc
 	call SetHPPal
-	farcall ApplyPartyMenuHPPals
+	ld a, CGB_PARTY_MENU_HP_PALS
+	call GetCGBLayout
 .skip
 	ld hl, wHPPalIndex
 	inc [hl]
@@ -675,7 +696,7 @@ PlacePartyMenuHPDigits:
 	lb bc, 2, 3
 	call PrintNum
 	pop de
-	ld a, '/'
+	ld a, "/"
 	ld [hli], a
 	inc de
 	inc de
@@ -715,7 +736,7 @@ PlacePartyMonLevel:
 	ld a, [de]
 	cp 100 ; This is distinct from MAX_LEVEL.
 	jr nc, .ThreeDigits
-	ld a, '<LV>'
+	ld a, "<LV>"
 	ld [hli], a
 	lb bc, PRINTNUM_LEFTALIGN | 1, 2
 	; jr .okay
@@ -899,16 +920,10 @@ PlacePartyMonEvoStoneCompatibility:
 	ld b, a
 	ld de, .string_not_able
 .loop2
-	ld a, b
-	cp LINKING_CORD
-	ld c, EVOLVE_TRADE + 1 ; due to "inc a"
-	jr z, .got_evolve_type
-	ld c, EVOLVE_ITEM + 1
-.got_evolve_type
 	ld a, [hli]
-	inc a
+	cp -1
 	jr z, .done
-	cp c
+	cp EVOLVE_ITEM
 	ld a, [hli]
 	inc hl
 	inc hl
@@ -958,9 +973,9 @@ PlacePartyMonGender:
 	xor a
 	ld [wMonType], a
 	call GetGender
-	ld a, ' '
+	ld a, " "
 	jr c, .got_gender
-	ld a, '<MALE>'
+	ld a, "<MALE>"
 	jr nz, .got_gender
 	inc a ; "<FEMALE>"
 
@@ -1153,7 +1168,7 @@ InitPartyMenuWithCancel:
 
 .done
 	ld [wMenuCursorY], a
-	ld a, PAD_A | PAD_B
+	ld a, A_BUTTON | B_BUTTON
 	ld [wMenuJoypadFilter], a
 	ret
 
@@ -1173,7 +1188,7 @@ InitPartySwap:
 	ld a, [wSwitchMon]
 	dec a
 	rst AddNTimes
-	ld [hl], '▷'
+	ld [hl], "▷"
 	ret
 
 InitPartyMenuNoCancel:
@@ -1193,7 +1208,7 @@ InitPartyMenuNoCancel:
 	ld a, 1
 .done
 	ld [wMenuCursorY], a
-	ld a, PAD_A | PAD_B
+	ld a, A_BUTTON | B_BUTTON
 	ld [wMenuJoypadFilter], a
 	ret
 
@@ -1213,7 +1228,7 @@ PartyMenuAttributes:
 	db 0
 
 PartyMenuSelect:
-; sets carry if exited menu.
+; sets carry if exitted menu.
 	call DoMenuJoypadLoop
 	call PlaceHollowCursor
 	ld a, [wPartyCount]
@@ -1225,7 +1240,7 @@ PartyMenuSelect:
 	ld [wPartyMenuCursor], a
 	ldh a, [hJoyLast]
 	ld b, a
-	bit B_PAD_B, b
+	bit B_BUTTON_F, b
 	jr nz, .exitmenu ; B button
 	ld a, [wMenuCursorY]
 	dec a
@@ -1239,21 +1254,22 @@ PartyMenuSelect:
 	add hl, bc
 	ld a, [hl]
 	ld [wCurForm], a
-	call .sfx_delay_2
-	and a
-	ret
 
-.exitmenu
-	call .sfx_delay_2
-	scf
-	ret
-
-.sfx_delay_2
 	ld de, SFX_READ_TEXT_2
 	call PlaySFX
 	push bc
 	call SFXDelay2
 	pop bc
+	and a
+	ret
+
+.exitmenu
+	ld de, SFX_READ_TEXT_2
+	call PlaySFX
+	push bc
+	call SFXDelay2
+	pop bc
+	scf
 	ret
 
 PlacePartyMenuText:

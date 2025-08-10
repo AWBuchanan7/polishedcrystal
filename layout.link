@@ -209,10 +209,6 @@ ROMX $42
 ROMX $48
 	"Pokemon Pic Pointers"
 
-ROMX $49
-	"Psychic Inver"
-	"PsychicInverGroup"
-
 VRAM $0
 	"VRAM0"
 
@@ -231,8 +227,7 @@ WRAM0
 	"Misc 1326"
 	org $cff0
 	"Options"
-	org $cffd
-	"SRAM Access Count"
+	org $cffe
 	"Rom Checksum"
 
 WRAMX $1

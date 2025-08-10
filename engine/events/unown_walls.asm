@@ -127,7 +127,7 @@ Special_DisplayUnownWords:
 	ld a, [de]
 	cp $ff
 	ret z
-	ld a, OAM_BANK1 | PAL_BG_BROWN
+	ld a, VRAM_BANK_1 | PAL_BG_BROWN
 	call .PlaceSquare
 	inc hl
 	inc hl

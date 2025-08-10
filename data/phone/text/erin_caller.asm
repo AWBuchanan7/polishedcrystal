@@ -2,6 +2,7 @@ ErinMonIsMuchStrongerText:
 	text_ram wStringBuffer3
 	text "'s "
 	text_ram wStringBuffer4
+	text ""
 	line "is much stronger"
 	cont "than before!"
 	done
@@ -22,6 +23,7 @@ ErinLostAMonText:
 
 	para "A wild "
 	text_ram wStringBuffer4
+	text ""
 	line "got away from me"
 
 	para "again. It's just"

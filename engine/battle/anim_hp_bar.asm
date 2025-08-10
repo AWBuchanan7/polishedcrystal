@@ -37,7 +37,16 @@ _AnimateHPBar:
 	ld c, a
 	ld b, [hl]
 	pop hl
-	call .ComputeBarPixels
+	sla c
+	rl b
+	call ComputeHPBarPixels
+	ld a, e
+	; because HP bar calculations are doubled for 60 to 30fps conversion,
+	; the last pixel is set to 2px/2, not 1px/2
+	cp 1
+	jr nz, .ok
+	inc a
+.ok
 	ld [wCurHPBarPixels], a
 
 	ld a, [wCurHPAnimNewHP]
@@ -48,7 +57,14 @@ _AnimateHPBar:
 	ld e, a
 	ld a, [wCurHPAnimMaxHP + 1]
 	ld d, a
-	call .ComputeBarPixels
+	sla c
+	rl b
+	call ComputeHPBarPixels
+	ld a, e
+	cp 1
+	jr nz, .ok2
+	inc a
+.ok2
 	ld [wNewHPBarPixels], a
 
 	push hl
@@ -92,18 +108,6 @@ _AnimateHPBar:
 	ld [wCurHPAnimDeltaHP], a
 	ld a, e
 	ld [wCurHPAnimDeltaHP + 1], a
-	ret
-
-.ComputeBarPixels:
-	sla c
-	rl b
-	call ComputeHPBarPixels
-	ld a, e
-	; because HP bar calculations are doubled for 60 to 30fps conversion,
-	; the last pixel is set to 2px/2, not 1px/2
-	cp 1 ; no-optimize a == 1 (preserve value)
-	ret nz
-	inc a
 	ret
 
 HPBarAnim_UpdateVariables:
@@ -193,7 +197,7 @@ HPBarAnim_UpdateHPRemaining:
 .update_hp_number
 	push hl
 	add hl, de
-	ld a, ' '
+	ld a, " "
 	ld [hli], a
 	ld [hli], a
 	ld [hld], a
@@ -230,7 +234,7 @@ HPBarAnim_BGMapUpdate:
 	ldh [hBGMapHalf], a
 	ld a, c
 	hlbgcoord 12, 2, vBGMap2
-	ld bc, TILEMAP_WIDTH * 2
+	ld bc, BG_MAP_WIDTH * 2
 	rst AddNTimes
 	ld a, [wCurHPAnimPal]
 	inc a
@@ -240,11 +244,11 @@ HPBarAnim_BGMapUpdate:
 	ldh [rVBK], a
 .waitnohb1
 	ldh a, [rSTAT]
-	and STAT_MODE ; wait until mode 1-3
+	and rSTAT_MODE_MASK ; wait until mode 1-3
 	jr z, .waitnohb1
 .waithbl1
 	ldh a, [rSTAT]
-	and STAT_MODE ; wait until mode 0
+	and rSTAT_MODE_MASK ; wait until mode 0
 	jr nz, .waithbl1
 	ld a, b
 	rept 7
@@ -256,30 +260,30 @@ HPBarAnim_BGMapUpdate:
 	jmp DelayFrame
 
 .enemy_hp_bar
-	lb bc, BGPI_AUTOINC | (0 palette PAL_BATTLE_BG_ENEMY_HP color 2), 0
-	ld hl, wBGPals2 palette PAL_BATTLE_BG_ENEMY_HP color 2
+	lb bc, $94, 0
+	ld hl, wBGPals2 + 2 palettes + 4
 	jr .finish
 
 .player_hp_bar
-	lb bc, BGPI_AUTOINC | (0 palette PAL_BATTLE_BG_PLAYER_HP color 2), 1
-	ld hl, wBGPals2 palette PAL_BATTLE_BG_PLAYER_HP color 2
+	lb bc, $9c, 1
+	ld hl, wBGPals2 + 3 palettes + 4
 .finish
 	xor a
 	ldh [hCGBPalUpdate], a
 	ld a, c
 	ldh [hBGMapHalf], a
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wBGPals2)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	di
 .waitnohb3
 	ldh a, [rSTAT]
-	and STAT_MODE ; wait until mode 1-3
+	and rSTAT_MODE_MASK ; wait until mode 1-3
 	jr z, .waitnohb3
 .waithb3
 	ldh a, [rSTAT]
-	and STAT_MODE ; wait until mode 0
+	and rSTAT_MODE_MASK ; wait until mode 0
 	jr nz, .waithb3
 	ld a, b
 	ldh [rBGPI], a
@@ -289,5 +293,5 @@ HPBarAnim_BGMapUpdate:
 	ldh [rBGPD], a
 	ei
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	jmp DelayFrame

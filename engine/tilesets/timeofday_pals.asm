@@ -39,14 +39,14 @@ _TimeOfDayPals::
 	ld hl, wBGPals1 palette 7
 
 ; save wram bank
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	ld b, a
 ; wram bank 5
 	ld a, 5
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 ; push palette
-	ld c, 4 ; PAL_COLORS
+	ld c, 4 ; NUM_PAL_COLORS
 .push
 	ld a, [hli]
 	ld d, a
@@ -58,7 +58,7 @@ _TimeOfDayPals::
 
 ; restore wram bank
 	ld a, b
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 ; update cgb pals
 	ld a, CGB_MAPPALS
@@ -68,14 +68,14 @@ _TimeOfDayPals::
 	ld hl, wBGPals1 palette 7 + 1 palettes - 1 ; last byte in UnknBGPals
 
 ; save wram bank
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	ld d, a
 ; wram bank 5
 	ld a, 5
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 ; pop palette
-	ld e, 4 ; PAL_COLORS
+	ld e, 4 ; NUM_PAL_COLORS
 .pop
 	pop bc
 	ld a, c
@@ -87,7 +87,7 @@ _TimeOfDayPals::
 
 ; restore wram bank
 	ld a, d
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 ; update palettes
 	farcall LoadMapPalettes
@@ -107,7 +107,7 @@ _UpdateTimePals::
 	ld c, $9 ; normal
 UpdatePalFromC::
 	call GetTimePalFade
-	jr DmgToCgbTimePals
+	jmp DmgToCgbTimePals
 
 FadeInPalettes_EnableDynNoApply:
 	farcall EnableDynPalUpdatesNoApply
@@ -124,13 +124,45 @@ Special_FadeInQuickly:
 	ld c, $0
 	call GetTimePalFade
 	ld b, $4
-	jr ConvertTimePalsIncHL
+	jmp ConvertTimePalsIncHL
 
 Special_FadeBlackQuickly:
 	ld c, $9
 	call GetTimePalFade
 	ld b, $4
-	jr ConvertTimePalsDecHL
+	jmp ConvertTimePalsDecHL
+
+FillWhiteBGColor:
+; Copy white palette of wBGPals1 Pal0 into white palette of wBGPals1 Pal1-Pal6
+	ldh a, [rSVBK]
+	push af
+	ld a, $5
+	ldh [rSVBK], a
+
+	ld hl, wBGPals1 palette 0
+	ld a, [hli]
+	ld e, a
+	ld d, [hl]
+	ld hl, wBGPals1 palette 1
+	ld c, 6
+.loop
+	ld a, e
+	ld [hli], a
+	ld a, d
+	ld [hli], a
+rept 6
+	inc hl
+endr
+	dec c
+	jr nz, .loop
+
+	pop af
+	ldh [rSVBK], a
+	ret
+
+MACRO brightlevel
+	db (\1 << 6) | (\2 << 4) | (\3 << 2) | \4
+ENDM
 
 ReplaceTimeOfDayPals:
 	ld a, [wMapTimeOfDay]
@@ -153,10 +185,6 @@ ReplaceTimeOfDayPals:
 	ld a, [hl]
 	ld [wTimeOfDayPalset], a
 	ret
-
-MACRO brightlevel
-	db (\1 << 6) | (\2 << 4) | (\3 << 2) | \4
-ENDM
 
 .BrightnessLevels:
 	brightlevel 3, 2, 1, 0 ; PALETTE_AUTO

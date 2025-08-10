@@ -1,10 +1,10 @@
 ClearPalettes::
 ; Make all palettes white
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 
 	ld a, BANK(wBGPals2)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 ; Fill wBGPals2 and wOBPals2 with $ffff (white)
 	ld hl, wBGPals2
@@ -24,7 +24,7 @@ else
 endc
 
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 ; Request palette update
 	ld a, 1

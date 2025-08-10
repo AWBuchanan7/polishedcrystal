@@ -15,7 +15,7 @@ TrainerCard:
 	bit 7, a
 	jr nz, .quit
 	ldh a, [hJoyLast]
-	and PAD_B
+	and B_BUTTON
 	jr nz, .quit
 	ld a, [wJumptableIndex]
 	ld hl, .Jumptable
@@ -39,7 +39,7 @@ TrainerCard:
 	farcall GetCardPic
 
 	ld hl, CardBorderGFX
-	ld de, vTiles0 tile ('┌' - 4)
+	ld de, vTiles0 tile ("┌" - 4)
 	lb bc, BANK(CardBorderGFX), 12
 	call DecompressRequest2bpp
 
@@ -62,7 +62,8 @@ TrainerCard:
 	xor a
 	ld [hli], a ; wJumptableIndex
 	ld [hli], a ; wTrainerCardBadgeFrameCounter
-	ld [hl], a  ; wTrainerCardBadgeTileID
+	ld [hli], a ; wTrainerCardBadgeTileID
+	ld [hl], a  ; TODO: check if this is still needed
 	ret
 
 .Jumptable:
@@ -104,7 +105,7 @@ TrainerCard_Page1_Joypad:
 	call TrainerCard_Page1_PrintGameTime
 	ld hl, hJoyLast
 	ld a, [hl]
-	and PAD_RIGHT | PAD_A
+	and D_RIGHT | A_BUTTON
 	ret z
 
 ; pressed_right_or_a
@@ -144,13 +145,13 @@ TrainerCard_Page2_Joypad:
 	call TrainerCard_Page2_3_AnimateBadges
 	ld hl, hJoyLast
 	ld a, [hl]
-	and PAD_RIGHT
+	and D_RIGHT
 	jr nz, .pressed_right
 	ld a, [hl]
-	and PAD_A
+	and A_BUTTON
 	jr nz, .pressed_a
 	ld a, [hl]
-	and PAD_LEFT
+	and D_LEFT
 	ret z
 
 ; pressed_left
@@ -211,10 +212,10 @@ TrainerCard_Page3_Joypad:
 	call TrainerCard_Page2_3_AnimateBadges
 	ld hl, hJoyLast
 	ld a, [hl]
-	and PAD_A
+	and A_BUTTON
 	jr nz, .quit
 	ld a, [hl]
-	and PAD_LEFT
+	and D_LEFT
 	ret z
 
 ; pressed_left
@@ -235,7 +236,7 @@ TrainerCard_LoadHeaderGFX:
 TrainerCard_PrintBorder:
 	hlcoord 0, 0
 
-	ld a, '┌'
+	ld a, "┌"
 	ld [hli], a
 	ld e, SCREEN_WIDTH - 2
 	inc a ; top border
@@ -336,13 +337,13 @@ TrainerCard_PrintTopHalfOfCard:
 	jmp PrintNum
 
 .Top_Headings:
-	db     '┌' - 4, "Name/<LNBRK>"
-	db     '┌' - 4, "<ID>№.<LNBRK>"
-	db     '┌' - 3
-	ds 11, '┌' - 2
-	db     '┌' - 1, "<LNBRK>"
-	db     "<LNBRK>"
-	db     " Money@"
+	db     "┌" - 4, "Name/"
+	next1  "┌" - 4, "<ID>№."
+	next1  "┌" - 3
+	ds 11, "┌" - 2
+	db     "┌" - 1
+	next1  ""
+	next1  " Money@"
 
 TrainerCardSetup_ClearBottomHalf:
 	hlcoord 1, 10
@@ -355,7 +356,7 @@ TrainerCard_Page1_PrintDexCaught_GameTime:
 	rst PlaceString
 
 	hlcoord 18, 16
-	ld [hl], '▶'
+	ld [hl], "▶"
 
 	ldh a, [hBGMapMode]
 	push af
@@ -427,10 +428,10 @@ TrainerCard_Page1_PrintGameTime:
 	ret nz
 	hlcoord 15, 12
 	ld a, [hl]
-	cp ':'
-	ld a, ':'
+	cp ":"
+	ld a, ":"
 	jr nz, .ok
-	ld a, ' '
+	ld a, " "
 .ok
 	ld [hl], a
 	ret
@@ -543,14 +544,16 @@ endr
 .PrepOAM:
 	ld a, [wTrainerCardBadgeTileID]
 	and $80
+	jr nz, .xflip
 	ld hl, .facing1
-	jr z, .loop2
+	jr .loop2
+
+.xflip
 	ld hl, .facing2
 .loop2
 	ld a, [hli]
-	inc a
+	cp $ff
 	ret z
-	dec a
 	add b
 	ld [de], a
 	inc de
@@ -566,7 +569,6 @@ endr
 	ld [de], a
 	inc hl
 	inc de
-
 	push hl
 	push bc
 	ld hl, wTrainerCardBadgePaletteAddr + 1
@@ -582,7 +584,6 @@ endr
 	ld a, b
 	pop bc
 	pop hl
-
 	add [hl]
 	ld [de], a
 	inc hl
@@ -598,10 +599,10 @@ endr
 	db -1
 
 .facing2
-	db 0, 0, 1, OAM_XFLIP
-	db 0, 8, 0, OAM_XFLIP
-	db 8, 0, 3, OAM_XFLIP
-	db 8, 8, 2, OAM_XFLIP
+	db 0, 0, 1, X_FLIP
+	db 0, 8, 0, X_FLIP
+	db 8, 0, 3, X_FLIP
+	db 8, 8, 2, X_FLIP
 	db -1
 
 TrainerCard_JohtoBadgesOAM:
@@ -634,12 +635,12 @@ TrainerCard_JohtoBadgesOAM:
 	db $0c | $80, $20, $24, $20 | $80
 
 	; Mineral Badge
-	db $80, $38, 4, 4, 4, 4
+	db $80, $38, 5, 5, 5, 5
 	db $10, $20, $24, $20 | $80
 	db $10, $20, $24, $20 | $80
 
 	; Storm Badge
-	db $80, $18, 5, 5, 5, 5
+	db $80, $18, 4, 4, 4, 4
 	db $14, $20, $24, $20 | $80
 	db $14 | $80, $20, $24, $20 | $80
 

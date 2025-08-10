@@ -8,7 +8,7 @@ PlaySlowCry:
 	ld b, a
 PlaySlowCryBC:
 ; can be used in stereo (e.g. battle engine)
-	call LoadCry
+	call LoadCryHeader
 	ret c
 	; cry length *= 1.5
 	ld hl, wCryLength
@@ -24,5 +24,5 @@ PlaySlowCryBC:
 	ld [wCryLength], a
 	ld a, h
 	ld [wCryLength + 1], a
-	farcall _PlayCry
+	farcall _PlayCryHeader
 	jmp WaitSFX

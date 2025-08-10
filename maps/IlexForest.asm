@@ -16,29 +16,28 @@ IlexForest_MapScriptHeader:
 	coord_event  9, 31, 2, IlexForestApprenticeTrigger
 
 	def_bg_events
-	bg_event  5, 19, BGEVENT_JUMPTEXT, IlexForestSignpost
-	bg_event 17, 33, BGEVENT_JUMPTEXT, IlexForestTrainerTips
+	bg_event  5, 19, BGEVENT_JUMPTEXT, Text_IlexForestSignpost0
 	bg_event 13,  9, BGEVENT_ITEM + ETHER, EVENT_ILEX_FOREST_HIDDEN_ETHER
 	bg_event 24, 16, BGEVENT_ITEM + SUPER_POTION, EVENT_ILEX_FOREST_HIDDEN_SUPER_POTION
 	bg_event  3, 19, BGEVENT_ITEM + FULL_HEAL, EVENT_ILEX_FOREST_HIDDEN_FULL_HEAL
 	bg_event 20,  9, BGEVENT_JUMPTEXT, Text_IlexForestMossRock
-	bg_event 10, 24, BGEVENT_UP, IlexForestShrineScript
+	bg_event 10, 24, BGEVENT_UP, MapIlexForestSignpost4Script
 	bg_event 25, 24, BGEVENT_ITEM + SILVER_LEAF, EVENT_ILEX_FOREST_HIDDEN_SILVER_LEAF_1
 	bg_event 19,  8, BGEVENT_ITEM + SILVER_LEAF, EVENT_ILEX_FOREST_HIDDEN_SILVER_LEAF_2
 	bg_event 25, 23, BGEVENT_JUMPSTD, treegrotto, HIDDENGROTTO_ILEX_FOREST
 	bg_event 26, 23, BGEVENT_JUMPSTD, treegrotto, HIDDENGROTTO_ILEX_FOREST
 
 	def_object_events
-	object_event 16, 33, SPRITE_FARFETCH_D, SPRITEMOVEDATA_SPINRANDOM_SLOW, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, IlexForestFarfetchdScript, EVENT_ILEX_FOREST_FARFETCHD
-	object_event  7, 30, SPRITE_BLACK_BELT, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, IlexForestCharcoalMasterScript, EVENT_ILEX_FOREST_CHARCOAL_MASTER
-	object_event 10, 31, SPRITE_KURT, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, ObjectEvent, EVENT_ILEX_FOREST_KURT
-	object_event  5, 26, SPRITE_PICNICKER, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, 0, OBJECTTYPE_COMMAND, jumptextfaceplayer, Text_IlexForestLass, EVENT_ILEX_FOREST_LASS
-	object_event 10, 26, SPRITE_CELEBI, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, ObjectEvent, EVENT_ILEX_FOREST_CELEBI
-	object_event  9, 25, SPRITE_LYRA, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, IlexForestLyraScript, EVENT_ILEX_FOREST_LYRA
-	object_event  9, 30, SPRITE_SCHOOLBOY, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, PAL_NPC_GREEN, OBJECTTYPE_SCRIPT, 0, IlexForestCharcoalApprenticeScript, EVENT_ILEX_FOREST_APPRENTICE
-	object_event 17, 16, SPRITE_ROCKER, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, PAL_NPC_GREEN, OBJECTTYPE_SCRIPT, 0, IlexForestHeadbuttGuyScript, -1
-	object_event 14,  3, SPRITE_BUG_CATCHER, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, 0, OBJECTTYPE_GENERICTRAINER, 0, GenericTrainerBugCatcherWayne, -1
-	object_event  4, 16, SPRITE_SCHOOLBOY, SPRITEMOVEDATA_SPINRANDOM_SLOW, 0, 0, -1, PAL_NPC_RED, OBJECTTYPE_COMMAND, jumptextfaceplayer, IlexForestHoneyBoyText, EVENT_ROUTE_34_ILEX_FOREST_GATE_LASS
+	object_event 16, 33, SPRITE_FARFETCH_D, SPRITEMOVEDATA_SPINRANDOM_SLOW, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, IlexForestFarfetchdScript, EVENT_ILEX_FOREST_FARFETCHD
+	object_event  7, 30, SPRITE_BLACK_BELT, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, IlexForestCharcoalMasterScript, EVENT_ILEX_FOREST_CHARCOAL_MASTER
+	object_event 10, 31, SPRITE_KURT, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, ObjectEvent, EVENT_ILEX_FOREST_KURT
+	object_event  5, 26, SPRITE_PICNICKER, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, -1, 0, OBJECTTYPE_COMMAND, jumptextfaceplayer, Text_IlexForestLass, EVENT_ILEX_FOREST_LASS
+	object_event 10, 26, SPRITE_CELEBI, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, ObjectEvent, EVENT_ILEX_FOREST_CELEBI
+	object_event  9, 25, SPRITE_LYRA, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, IlexForestLyraScript, EVENT_ILEX_FOREST_LYRA
+	object_event  9, 30, SPRITE_SCHOOLBOY, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, -1, PAL_NPC_GREEN, OBJECTTYPE_SCRIPT, 0, IlexForestCharcoalApprenticeScript, EVENT_ILEX_FOREST_APPRENTICE
+	object_event 17, 16, SPRITE_ROCKER, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, -1, PAL_NPC_GREEN, OBJECTTYPE_SCRIPT, 0, IlexForestHeadbuttGuyScript, -1
+	object_event 14,  3, SPRITE_BUG_CATCHER, SPRITEMOVEDATA_STANDING_UP, 0, 0, -1, -1, 0, OBJECTTYPE_GENERICTRAINER, 0, GenericTrainerBug_catcherWayne, -1
+	object_event  4, 16, SPRITE_SCHOOLBOY, SPRITEMOVEDATA_SPINRANDOM_SLOW, 0, 0, -1, -1, PAL_NPC_RED, OBJECTTYPE_COMMAND, jumptextfaceplayer, IlexForestHoneyBoyText, EVENT_ROUTE_34_ILEX_FOREST_GATE_LASS
 	cuttree_event 10, 27, EVENT_ILEX_FOREST_CUT_TREE
 	itemball_event 22, 34, REVIVE, 1, EVENT_ILEX_FOREST_REVIVE
 	itemball_event 11, 19, X_ATTACK, 1, EVENT_ILEX_FOREST_X_ATTACK
@@ -401,8 +400,8 @@ IlexForestTutorHeadbuttScript:
 	takeitem SILVER_LEAF
 	jumpopenedtext Text_IlexForestTutorTaught
 
-GenericTrainerBugCatcherWayne:
-	generictrainer BUG_CATCHER, WAYNE, EVENT_BEAT_BUG_CATCHER_WAYNE, BugCatcherWayneSeenText, BugCatcherWayneBeatenText
+GenericTrainerBug_catcherWayne:
+	generictrainer BUG_CATCHER, WAYNE, EVENT_BEAT_BUG_CATCHER_WAYNE, Bug_catcherWayneSeenText, Bug_catcherWayneBeatenText
 
 	text "A #mon I've"
 	line "never seen before"
@@ -416,7 +415,7 @@ GenericTrainerBugCatcherWayne:
 	cont "places too."
 	done
 
-IlexForestShrineScript:
+MapIlexForestSignpost4Script:
 	checkevent EVENT_FOREST_IS_RESTLESS
 	iffalsefwd .DontDoCelebiEvent
 	checkkeyitem GS_BALL
@@ -884,10 +883,7 @@ Text_CharcoalMasterOutro:
 	para "use Cut to clear"
 	line "small trees."
 
-	para "You don't have to"
-	line "teach it to them"
-
-	para "unless you want"
+	para "Or teach it to"
 	line "them to use Cut"
 	cont "in a battle."
 
@@ -895,8 +891,7 @@ Text_CharcoalMasterOutro:
 	line "have to have the"
 
 	para "Gym Badge from"
-	line "Azalea to use it"
-	cont "outside of battle."
+	line "Azalea to use it."
 	done
 
 Text_CharcoalMasterTalkAfter:
@@ -997,7 +992,7 @@ Text_IlexForestMossRock:
 	line "ly cool."
 	done
 
-IlexForestSignpost:
+Text_IlexForestSignpost0:
 	text "Ilex Forest is"
 	line "so overgrown with"
 
@@ -1007,26 +1002,6 @@ IlexForestSignpost:
 	para "Please watch out"
 	line "for items that may"
 	cont "have been dropped."
-	done
-
-IlexForestTrainerTips:
-	text "Trainer Tips!"
-
-	para "As long as you"
-	line "have the HM in"
-	cont "your bag,"
-
-	para "and #mon in"
-	line "your party that"
-
-	para "are compatible"
-	line "with that HM can"
-
-	para "use the move out-"
-	line "of battle. You"
-
-	para "don't even have to"
-	line "teach it!"
 	done
 
 Text_IlexForestShrine:
@@ -1159,7 +1134,7 @@ Text_IlexForestLyraGoodbye:
 	para "See you!"
 	done
 
-BugCatcherWayneSeenText:
+Bug_catcherWayneSeenText:
 	text "Don't sneak up on"
 	line "me like that!"
 
@@ -1167,7 +1142,7 @@ BugCatcherWayneSeenText:
 	line "#mon away!"
 	done
 
-BugCatcherWayneBeatenText:
+Bug_catcherWayneBeatenText:
 	text "I hadn't seen that"
 	line "#mon before…"
 	done

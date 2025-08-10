@@ -16,19 +16,19 @@ BattleCommand_attract:
 	jr nz, .no_ability_protection
 
 	; don't display anything in case we're in cute charm
-	ld a, [wInAbility]
+	ld a, [wAnimationsDisabled]
 	and a
 	ret nz
 
-	farcall BeginAbility
+	farcall DisableAnimations
 	farcall ShowEnemyAbilityActivation
 	ld hl, DoesntAffectText
 	call StdBattleTextbox
-	farjp EndAbility
+	farjp EnableAnimations
 
 .failed
 	; don't display anything in case we're in cute charm
-	ld a, [wInAbility]
+	ld a, [wAnimationsDisabled]
 	and a
 	ret nz
 

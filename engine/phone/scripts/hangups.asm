@@ -33,7 +33,7 @@ ReenaForwardScript:
 	promptbutton
 	sjump PhoneScript_HangupText_Female
 
-JoeyHangUpScript: ; TODO: use this
+JoeyHangUpScript:
 	farwritetext JoeyDevisingStrategiesText
 	promptbutton
 	sjump PhoneScript_HangupText_Male

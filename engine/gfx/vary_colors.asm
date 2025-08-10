@@ -13,10 +13,10 @@ CopyDVsToColorVaryDVs:
 	ld a, [hl]
 	ld b, a
 
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, $5
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	ld hl, wColorVaryDVs
 ; wColorVaryDVs = HPAtkDV
@@ -46,7 +46,7 @@ CopyDVsToColorVaryDVs:
 	ld [hl], c
 
 	ld a, d
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ret
 
 GetColorChannelVariedByDV:
@@ -205,10 +205,10 @@ endc
 	ret
 
 .continue
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, $5
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	ld bc, wColorVaryDVs
 
@@ -289,7 +289,7 @@ endc
 	inc hl
 
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ret
 
 ; TODO: vary paint color with unused DV bits

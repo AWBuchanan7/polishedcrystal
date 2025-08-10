@@ -19,6 +19,7 @@ DEF NUM_PC_MODES EQU const_value
 	const BOXMENU_DEPOSIT
 	const BOXMENU_STATS
 	const BOXMENU_SWITCH
+	const BOXMENU_MOVES
 	const BOXMENU_ITEM
 	const BOXMENU_RELEASE
 	const BOXMENU_CHANGE
@@ -50,7 +51,7 @@ _BillsPC:
 	; Disable hblank before restoring blockdata, since blockdata and hblank pals
 	; overlap.
 	ld hl, rIE
-	res B_IE_STAT, [hl]
+	res LCD_STAT, [hl]
 	ld a, LOW(LCDGeneric)
 	ldh [hFunctionTargetLo], a
 	ld a, HIGH(LCDGeneric)
@@ -157,14 +158,14 @@ BillsPC_LoadUI:
 
 	; Gender symbols and shiny star
 	ld hl, BattleExtrasGFX
-	ld de, vTiles2 tile $42
+	ld de, vTiles2 tile $41
 	lb bc, BANK(BattleExtrasGFX), 3
 	call DecompressRequest2bpp
 
-	; Box frame tiles and Pokérus symbols
+	; Box frame tiles and Pokérus symbol
 	ld hl, BillsPC_TileGFX
 	ld de, vTiles2 tile $31
-	lb bc, BANK(BillsPC_TileGFX), 17
+	lb bc, BANK(BillsPC_TileGFX), 16
 	call DecompressRequest2bpp
 
 	; Set up background + outline palettes
@@ -219,7 +220,7 @@ UseBillsPC:
 	; Item name is in vbk1
 	hlcoord 10, 2, wAttrmap ; Cursor's item
 	ld bc, 10
-	ld a, OAM_BANK1
+	ld a, VRAM_BANK_1
 	push bc
 	rst ByteFill
 	pop bc
@@ -282,13 +283,13 @@ UseBillsPC:
 	; Party
 	hlcoord 1, 11
 	lb bc, 3, 2
-	lb de, $80, 2 | OAM_BANK1
+	lb de, $80, 2 | VRAM_BANK_1
 	call .WriteIconTilemap
 
 	; Storage
 	hlcoord 8, 7
 	lb bc, 5, 4
-	lb de, $98, 4 | OAM_BANK1
+	lb de, $98, 4 | VRAM_BANK_1
 	call .WriteIconTilemap
 
 	; Update attribute map data
@@ -307,7 +308,7 @@ UseBillsPC:
 	ld a, HIGH(wLCDBillsPC1)
 	ldh [hFunctionTargetHi], a
 	ld hl, rIE
-	set B_IE_STAT, [hl]
+	set LCD_STAT, [hl]
 
 	; Display data about current Pokémon pointed to by cursor
 	call GetCursorMon
@@ -340,9 +341,9 @@ UseBillsPC:
 	db $31, $7f, $31 ; middle
 	db $33, $32, $33 ; bottom
 .BoxAttr:
-	db 1, 1, 1 | OAM_XFLIP ; top
-	db 1, 2 | OAM_BANK1, 1 | OAM_XFLIP ; middle
-	db 1 | OAM_YFLIP, 1 | OAM_YFLIP, 1 | OAM_XFLIP | OAM_YFLIP ; bottom
+	db 1, 1, 1 | X_FLIP ; top
+	db 1, 2 | VRAM_BANK_1, 1 | X_FLIP ; middle
+	db 1 | Y_FLIP, 1 | Y_FLIP, 1 | X_FLIP | Y_FLIP ; bottom
 
 .SpecialRow:
 ; Draws a nonstandard box outline
@@ -496,7 +497,7 @@ BillsPC_SafeGet2bpp:
 BillsPC_PrintBoxName:
 ; Writes name of current Box to box name area in storage system
 	hlcoord 9, 5
-	ld a, ' '
+	ld a, " "
 	ld bc, 9
 	rst ByteFill
 
@@ -514,7 +515,7 @@ BillsPC_PrintBoxName:
 .loop
 	ld a, [hli]
 	inc b
-	cp '@'
+	cp "@"
 	jr nz, .loop
 	srl b
 	ld a, 5
@@ -538,6 +539,7 @@ SetPartyIcons:
 	ld a, PARTY_LENGTH
 	call BillsPC_BlankTiles
 
+_SetPartyIcons:
 	; Write party members
 	lb bc, 0, 1
 	ld hl, wBillsPC_PartyList
@@ -559,6 +561,7 @@ SetBoxIcons:
 	ld a, MONS_PER_BOX
 	call BillsPC_BlankTiles
 
+_SetBoxIcons:
 	; Write box members
 	ld a, [wCurBox]
 	inc a
@@ -920,7 +923,7 @@ BillsPC_SetBoxArrows:
 	jr c, .box_cursors
 
 	; Clear box switch arrows.
-	ld a, ' '
+	ld a, " "
 	hlcoord 8, 5
 	ld [hl], a
 	hlcoord 18, 5
@@ -930,9 +933,9 @@ BillsPC_SetBoxArrows:
 
 .box_cursors
 	hlcoord 8, 5
-	ld [hl], '◀'
+	ld [hl], "◀"
 	hlcoord 18, 5
-	ld [hl], '▶'
+	ld [hl], "▶"
 	ret
 
 _GetCursorMon:
@@ -1000,7 +1003,7 @@ _GetCursorMon:
 	farcall PrepareFrontpic
 
 	push hl
-	ld a, '@'
+	ld a, "@"
 	ld [wStringBuffer2], a
 	call GetMonItemUnlessCursor
 	jr z, .delay_loop
@@ -1021,7 +1024,7 @@ _GetCursorMon:
 	jr nc, .delay_loop
 
 	ld a, [wAttrmap]
-	and OAM_BANK1
+	and VRAM_BANK_1
 	pop hl
 	push af
 	ld a, 0 ; no-optimize a = 0
@@ -1029,15 +1032,15 @@ _GetCursorMon:
 	inc a
 	ldh [rVBK], a
 .dont_switch_vbk
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wDecompressScratch)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	call GetPaddedFrontpicAddress
 	lb bc, BANK(_GetCursorMon), 7 * 7
 	call Get2bpp
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	xor a
 	ldh [rVBK], a
 	ld hl, wBillsPC_ItemVWF
@@ -1077,7 +1080,7 @@ _GetCursorMon:
 	pop af
 	ld a, 2
 	jr nz, .got_new_tile_bank
-	ld a, 2 | OAM_BANK1
+	ld a, 2 | VRAM_BANK_1
 .got_new_tile_bank
 	hlcoord 0, 0, wAttrmap
 	lb bc, 7, 7
@@ -1118,7 +1121,7 @@ _GetCursorMon:
 	ld [hli], a
 	ld a, $20
 	ld [hli], a
-	ld [hl], OAM_BANK1
+	ld [hl], VRAM_BANK_1
 .item_icon_done
 
 	ld b, 0
@@ -1147,7 +1150,7 @@ _GetCursorMon:
 	ld a, [wTempMonForm]
 	ld [wNamedObjectIndex+1], a
 	hlcoord 8, 1
-	ld a, '/'
+	ld a, "/"
 	ld [hli], a
 	call GetPokemonName
 	ld de, wStringBuffer1
@@ -1163,7 +1166,7 @@ _GetCursorMon:
 	farcall GetGender
 	hlcoord 4, 8
 	jr c, .genderless
-	ld a, $42
+	ld a, $41
 	jr nz, .male
 	; female
 	inc a
@@ -1177,16 +1180,17 @@ _GetCursorMon:
 	pop hl
 	inc hl
 	jr z, .not_shiny
-	ld [hl], $44
+	ld [hl], $43
 .not_shiny
 	ld a, [wTempMonPokerusStatus]
 	and POKERUS_MASK
 	inc hl
 	jr z, .did_pokerus
-	ld [hl], $41 ; cured
+	; TODO: smiley face if cured (use shiny color + custom color 3?)
+	ld [hl], "."
 	cp POKERUS_CURED
 	jr z, .did_pokerus
-	ld [hl], $40 ; infected
+	ld [hl], $40 ; Rs
 .did_pokerus
 
 	; Item
@@ -1431,7 +1435,7 @@ ManageBoxes:
 
 .StorageMonMenu:
 	db MENU_BACKUP_TILES
-	menu_coords 9, 4, 19, 17
+	menu_coords 9, 2, 19, 17
 	dw .StorageMenuData2
 	db 1 ; default option
 
@@ -1444,7 +1448,7 @@ ManageBoxes:
 
 .PartyMonMenu:
 	db MENU_BACKUP_TILES
-	menu_coords 10, 4, 19, 17
+	menu_coords 10, 2, 19, 17
 	dw .PartyMenuData2
 	db 1 ; default option
 
@@ -1469,20 +1473,22 @@ ManageBoxes:
 	dw BillsPC_MenuStrings
 
 .storageitems
-	db 6
+	db 7
 	db BOXMENU_WITHDRAW
 	db BOXMENU_STATS
 	db BOXMENU_SWITCH
+	db BOXMENU_MOVES
 	db BOXMENU_ITEM
 	db BOXMENU_RELEASE
 	db BOXMENU_CANCEL
 	db -1
 
 .partyitems
-	db 6
+	db 7
 	db BOXMENU_DEPOSIT
 	db BOXMENU_STATS
 	db BOXMENU_SWITCH
+	db BOXMENU_MOVES
 	db BOXMENU_ITEM
 	db BOXMENU_RELEASE
 	db BOXMENU_CANCEL
@@ -1502,8 +1508,9 @@ BillsPC_MenuStrings:
 	; pokémon management options
 	db "Withdraw@"
 	db "Deposit@"
-	db "Summary@"
+	db "Stats@"
 	db "Switch@"
+	db "Moves@"
 	db "Item@"
 	db "Release@"
 	; box options
@@ -1526,6 +1533,7 @@ BillsPC_MenuJumptable:
 	dw BillsPC_Deposit
 	dw BillsPC_Stats
 	dw BillsPC_Switch
+	dw BillsPC_Moves
 	dw BillsPC_Item
 	dw BillsPC_Release
 	dw BillsPC_Change
@@ -1540,7 +1548,7 @@ BillsPC_MenuJumptable:
 
 BillsPC_Stats:
 	call BillsPC_PrepareTransistion
-	farcall _OpenTempmonSummary
+	farcall _OpenPartyStats
 	call BillsPC_MoveCursorAfterStatScreen
 	jmp BillsPC_ReturnFromTransistion
 
@@ -1561,9 +1569,9 @@ BillsPC_MoveCursorAfterStatScreen:
 	add b ; add to remainder (column offset)
 	ld b, a
 	pop af
-	ln a, 1, 2 ; box baseline Y, X
+	ld a, $12 ; box baseline $YX
 	jr nz, .got_baseline
-	ln a, 3, 0 ; party baseline Y, X
+	ld a, $30 ; party baseline $YX
 .got_baseline
 	add b
 	; cursor is now in a
@@ -1633,17 +1641,17 @@ BillsPC_MoveIconData:
 ; Box -1 is a sentinel for held (slot 0) or quick (slot 1).
 ; TODO: can we make this code (.GetAddr especially) less messy?
 	; Copy palette data
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wOBPals1)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	xor a
 	ldh [hBGMapMode], a
 
 	; Copy palette data
 	call .Copy
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	ld a, 1
 	ldh [rVBK], a
@@ -2130,9 +2138,24 @@ BillsPC_PrepareTransistion:
 
 	; Disable hblank interrupt.
 	ld hl, rIE
-	res B_IE_STAT, [hl]
+	res LCD_STAT, [hl]
 
 	jmp ClearSprites
+
+BillsPC_Moves:
+	ld a, [wTempMonIsEgg]
+	bit MON_IS_EGG_F, a
+	ld hl, .CantCheckEggMoves
+	jmp nz, BillsPC_PrintText
+	call BillsPC_PrepareTransistion
+	farcall _ManagePokemonMoves
+	call BillsPC_MoveCursorAfterStatScreen
+	jr BillsPC_ReturnFromTransistion
+
+.CantCheckEggMoves:
+	text "You can't check"
+	line "an Egg's moves!"
+	prompt
 
 BillsPC_GetStorageSpace:
 ; Forces game save until we have at least a free pokedb entries left.
@@ -2326,7 +2349,7 @@ BillsPC_MoveItem:
 	ld [hli], a
 	ld a, $06
 	ld [hli], a
-	ld [hl], OAM_BANK1 | PAL_CURSOR_MODE2
+	ld [hl], VRAM_BANK_1 | PAL_CURSOR_MODE2
 
 	; Load held item name
 	ld hl, vTiles5 tile $3b
@@ -2511,6 +2534,7 @@ BillsPC_PackFullText:
 BillsPC_MovedToPackText:
 	text "Moved "
 	text_ram wStringBuffer1
+	text ""
 	line "to Bag."
 	prompt
 
@@ -2682,15 +2706,9 @@ BillsPC_CanReleaseMon:
 	; Can't release Eggs.
 	ld a, [wTempMonIsEgg]
 	bit MON_IS_EGG_F, a
-	jr z, .not_egg
-
-	; Allow release of Bad Eggs.
-	ld a, [wTempMonNickname]
-	cp 'B' ; Assume "Bad Egg" (since the only alternative is "Egg").
 	ld a, RELEASE_EGG
 	ret nz
 
-.not_egg
 	xor a ; RELEASE_OK
 .done
 	and a
@@ -2720,7 +2738,7 @@ RemoveStorageBoxMon_MaybeRespawn:
 	inc de
 	inc hl
 	jr nz, .done
-	cp '@'
+	cp "@"
 	jr nz, .loop
 
 	; This is ours. Check which, if any, beast we should respawn.
@@ -2928,7 +2946,7 @@ BillsPC_Rename:
 	ld hl, wStringBuffer2
 
 	; Abort if no name was entered.
-	ld a, '@'
+	ld a, "@"
 	cp [hl]
 	jr z, .abort
 	ld de, wStringBuffer1
@@ -2959,7 +2977,7 @@ BillsPC_Theme:
 	call CloseWindow
 
 	ld a, [wMenuJoypad]
-	cp PAD_B
+	cp B_BUTTON
 	jr z, .refresh_theme ; revert back to what it used to be
 
 	ld a, [wScrollingMenuCursorPosition]
@@ -3042,7 +3060,7 @@ BillsPC_Change:
 	call CloseWindow
 
 	ld a, [wMenuJoypad]
-	cp PAD_B
+	cp B_BUTTON
 	ret z
 
 	ld a, [wScrollingMenuCursorPosition]
@@ -3590,10 +3608,8 @@ BillsPC_RestoreUI:
 	ld b, 2
 	call SafeCopyTilemapAtOnce
 
-	ld a, 71
-	ldh [rLYC], a
 	ld hl, rIE
-	set B_IE_STAT, [hl]
+	set LCD_STAT, [hl]
 
 	ld a, 1
 	ldh [hBGMapMode], a
@@ -3644,7 +3660,7 @@ LOAD UNION "Misc 1326", WRAM0
 wLCDBillsPC1::
 	; Write boxmon palettes
 	ldh a, [rSTAT]
-	bit B_STAT_LYCF, a
+	bit rSTAT_LYC_CMP, a
 	jr z, .donepc
 	push hl
 	push bc
@@ -3653,7 +3669,7 @@ wLCDBillsPC1::
 
 	; start of VRAM writes
 	; second box mon
-	ld a, BGPI_AUTOINC | (0 palette 5 color 1)
+	ld a, $80 | $2a
 	ldh [rBGPI], a
 rept 4
 	ld a, [hli]
@@ -3661,7 +3677,7 @@ rept 4
 endr
 
 	; third box mon
-	ld a, BGPI_AUTOINC | (0 palette 6 color 1)
+	ld a, $80 | $32
 	ldh [rBGPI], a
 rept 4
 	ld a, [hli]
@@ -3669,7 +3685,7 @@ rept 4
 endr
 
 	; fourth box mon
-	ld a, BGPI_AUTOINC | (0 palette 7 color 1)
+	ld a, $80 | $3a
 	ldh [rBGPI], a
 rept 4
 	ld a, [hli]
@@ -3696,7 +3712,7 @@ wLCDBillsPC2::
 
 	; start of VRAM writes
 	; first party mon
-	ld a, BGPI_AUTOINC | (0 palette 2 color 1)
+	ld a, $80 | $12
 	ldh [rBGPI], a
 rept 4
 	ld a, [hli]
@@ -3704,7 +3720,7 @@ rept 4
 endr
 
 	; second party mon
-	ld a, BGPI_AUTOINC | (0 palette 3 color 1)
+	ld a, $80 | $1a
 	ldh [rBGPI], a
 rept 4
 	ld a, [hli]
@@ -3712,7 +3728,7 @@ rept 4
 endr
 
 	; first box mon
-	ld a, BGPI_AUTOINC | (0 palette 4 color 1)
+	ld a, $80 | $22
 	ldh [rBGPI], a
 rept 4
 	ld a, [hli]
@@ -3769,10 +3785,10 @@ wLCDBillsPC3:
 	push hl
 	push bc
 	push de
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK("GBC Video")
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	ld c, LOW(rBGPD)
 	ldh a, [rLY]
@@ -3783,7 +3799,8 @@ wLCDBillsPC3:
 .got_pal
 
 	; start of VRAM writes
-	ld a, BGPI_AUTOINC | (0 palette 3 color 0)
+	; BG3 color 0
+	ld a, $80 | $18
 	ldh [rBGPI], a
 rept 2
 	ld a, [hli]
@@ -3792,7 +3809,7 @@ endr
 	; end of VRAM writes
 
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ld a, LOW(wLCDBillsPC1)
 	ldh [hFunctionTargetLo], a
 	ld a, HIGH(wLCDBillsPC1)

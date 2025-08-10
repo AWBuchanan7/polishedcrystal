@@ -6,7 +6,7 @@ SoftReset::
 	call ClearPalettes
 	xor a
 	ldh [rIF], a
-	ld a, IE_VBLANK
+	ld a, 1 << VBLANK
 	ldh [rIE], a
 	ei
 
@@ -42,5 +42,5 @@ _Start::
 Init::
 	di
 	ld a, BANK(_Init)
-	ld [rROMB], a
+	ld [MBC3RomBank], a
 	jmp _Init ; far-ok

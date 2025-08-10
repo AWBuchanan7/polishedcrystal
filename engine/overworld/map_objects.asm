@@ -39,7 +39,7 @@ HandleObjectStep:
 	jmp nz, SetFacingStanding
 	ld hl, OBJECT_FLAGS2
 	add hl, bc
-	bit OFF_SCREEN_F, [hl]
+	bit OBJ_FLAGS2_6, [hl]
 	jmp nz, SetFacingStanding
 	bit FROZEN_F, [hl]
 	jr nz, HandleObjectAction
@@ -69,7 +69,7 @@ INCLUDE "engine/overworld/map_object_action.asm"
 _CheckObjectStillVisible:
 	ld hl, OBJECT_FLAGS2
 	add hl, bc
-	res OFF_SCREEN_F, [hl]
+	res OBJ_FLAGS2_6, [hl]
 	ldh a, [hMapObjectIndexBuffer]
 	and a
 	jr nz, .notPlayer
@@ -178,7 +178,7 @@ _HandleStepType:
 .do_step_type
 	call StackJumpTable
 
-.StepTypesJumptable:
+StepTypesJumptable:
 ; entries correspond to STEP_TYPE_* constants (see constants/map_object_constants.asm)
 	table_width 2
 	dw StepFunction_Reset           ; STEP_TYPE_RESET
@@ -661,8 +661,8 @@ endr
 	jr z, .on_pit
 	ld hl, OBJECT_FLAGS2
 	add hl, bc
-	bit BOULDER_MOVING_F, [hl]
-	res BOULDER_MOVING_F, [hl]
+	bit OBJ_FLAGS2_2, [hl]
+	res OBJ_FLAGS2_2, [hl]
 	jr z, .ok
 	ld hl, OBJECT_RANGE
 	add hl, bc
@@ -1646,7 +1646,7 @@ StepFunction_StrengthBoulder:
 	pop bc
 	ld hl, OBJECT_FLAGS2
 	add hl, bc
-	res BOULDER_MOVING_F, [hl]
+	res OBJ_FLAGS2_2, [hl]
 	call CopyNextCoordsTileToStandingCoordsTile
 	ld hl, OBJECT_WALKING
 	add hl, bc
@@ -1901,6 +1901,14 @@ GetMovementByte:
 	ld hl, wMovementDataPointer
 	jmp _GetMovementByte
 
+GetMovementObject:
+	ld a, [wMovementObject]
+	ret
+
+_GetMovementObject:
+	ld hl, GetMovementObject
+	; fallthrough
+
 HandleMovementData:
 	call .StorePointer
 .loop
@@ -1928,6 +1936,12 @@ ContinueReadingMovement:
 	ld a, 1
 	ld [wMovementByteWasControlSwitch], a
 	ret
+
+DoMovementFunction:
+	push af
+	call ApplyMovementToFollower
+	pop af
+	call StackJumpTable
 
 INCLUDE "engine/overworld/movement.asm"
 
@@ -2340,7 +2354,7 @@ CheckCurSpriteCoveredByTextbox:
 	and %00011111
 	cp SCREEN_WIDTH
 	jr c, .ok3
-	sub TILEMAP_WIDTH
+	sub BG_MAP_WIDTH
 .ok3
 	ldh [hCurSpriteXCoord], a
 ; y coord
@@ -2371,13 +2385,13 @@ CheckCurSpriteCoveredByTextbox:
 	and %00011111
 	cp SCREEN_HEIGHT
 	jr c, .ok6
-	sub TILEMAP_HEIGHT
+	sub BG_MAP_HEIGHT
 .ok6
 	ldh [hCurSpriteYCoord], a
 	; priority check
 	ld hl, OBJECT_PALETTE
 	add hl, bc
-	bit B_OAM_PRIO, [hl]
+	bit OAM_PRIORITY, [hl]
 	jr z, .ok7
 	ld a, d
 	add 2
@@ -2407,7 +2421,7 @@ CheckCurSpriteCoveredByTextbox:
 	push bc
 	call Coord2Attr
 	pop bc
-	bit B_OAM_BANK1, [hl] ; show sprites standing on tiles $1:00-FF
+	bit OAM_TILE_BANK, [hl] ; show sprites standing on tiles $1:00-FF
 	jr nz, .ok8
 	push bc
 	call Coord2Tile
@@ -2694,9 +2708,9 @@ _UpdateSprites::
 
 	; objects are at the end of the OAM, so we need to get the OAM index of the slot before.
 	ldh a, [hUsedOAMIndex]
-	; a = (OAM_COUNT - 1) * OBJ_SIZE - a
+	; a = (NUM_SPRITE_OAM_STRUCTS - 1) * SPRITEOAMSTRUCT_LENGTH - a
 	cpl
-	add (OAM_COUNT - 1) * OBJ_SIZE + 1
+	add (NUM_SPRITE_OAM_STRUCTS - 1) * SPRITEOAMSTRUCT_LENGTH + 1
 
 	; if the weather index is greater than the index of the slot before the objects,
 	; then we need to override the weather index with the slot before the objects.
@@ -2709,9 +2723,9 @@ _UpdateSprites::
 	; from the slot before the objects to the weather index, hide the sprites.
 	ld l, a
 	ld h, HIGH(wShadowOAM)
-	ld de, -OBJ_SIZE
+	ld de, -SPRITEOAMSTRUCT_LENGTH
 	ld a, c
-	sub OBJ_SIZE
+	sub SPRITEOAMSTRUCT_LENGTH
 	ld c, OAM_YCOORD_HIDDEN
 .loop
 	ld [hl], c
@@ -2866,26 +2880,26 @@ InitSprites:
 	xor a
 	bit 7, [hl]
 	jr nz, .skip1
-	or OAM_BANK1
+	or VRAM_BANK_1
 .skip1
 	ld hl, OBJECT_FLAGS2
 	add hl, bc
 	ld e, [hl]
-	bit OBJ_FLAGS2_7_F, e
+	bit OBJ_FLAGS2_7, e
 	jr z, .skip2
-	or OAM_PRIO
+	or PRIORITY
 .skip2
 	ld hl, OBJECT_PALETTE
 	add hl, bc
 	ld d, a
 	ld a, [hl]
-	and OAM_PALETTE
+	and PALETTE_MASK
 	or d
 	ld d, a
 	xor a
 	bit OVERHEAD_F, e
 	jr z, .skip3
-	or OAM_PRIO
+	or PRIORITY
 .skip3
 	ldh [hCurSpriteOAMFlags], a
 	ld hl, OBJECT_SPRITE_X
@@ -2926,9 +2940,9 @@ InitSprites:
 	ld h, [hl]
 	ld l, a
 	ldh a, [hUsedOAMIndex]
-	; a = (OAM_COUNT - 1) * OBJ_SIZE - a
+	; a = (NUM_SPRITE_OAM_STRUCTS - 1) * SPRITEOAMSTRUCT_LENGTH - a
 	cpl
-	add OBJ_SIZE * (OAM_COUNT - 1) + 1
+	add SPRITEOAMSTRUCT_LENGTH * (NUM_SPRITE_OAM_STRUCTS - 1) + 1
 	ld c, a
 	ld b, HIGH(wShadowOAM)
 	ld a, [hli]
@@ -2958,7 +2972,7 @@ InitSprites:
 	inc hl
 	ld [bc], a
 	ld a, d
-	and OAM_BANK1
+	and VRAM_BANK_1
 	jr z, .vram0
 	ld a, [bc]
 	cp $80
@@ -2974,7 +2988,7 @@ InitSprites:
 	ldh a, [hCurSpriteOAMFlags]
 .nope2
 	or e
-	and OAM_XFLIP | OAM_YFLIP | OAM_PRIO
+	and X_FLIP | Y_FLIP | PRIORITY
 	or d
 	bit NEXT_PALETTE_F, e
 	jr z, .nope3
@@ -2983,13 +2997,13 @@ InitSprites:
 	ld [bc], a
 	inc c
 	ld a, c
-	sub OBJ_SIZE * 2
+	sub SPRITEOAMSTRUCT_LENGTH * 2
 	ld c, a
 	ldh a, [hUsedSpriteTile]
 	dec a
 	ldh [hUsedSpriteTile], a
 	jr nz, .addsprite
-	ld a, OBJ_SIZE * (OAM_COUNT - 1)
+	ld a, SPRITEOAMSTRUCT_LENGTH * (NUM_SPRITE_OAM_STRUCTS - 1)
 	sub c
 	ld c, a
 	ldh [hUsedOAMIndex], a
@@ -3015,8 +3029,8 @@ endr
 	cp LOW(wPlayerStruct)
 	ret nz
 	ldh a, [hUsedOAMIndex]
-	; a = (OAM_COUNT - 4) * OBJ_SIZE - a
+	; a = (NUM_SPRITE_OAM_STRUCTS - 4) * SPRITEOAMSTRUCT_LENGTH - a
 	cpl
-	add (OAM_COUNT - 4) * OBJ_SIZE + 1
+	add (NUM_SPRITE_OAM_STRUCTS - 4) * SPRITEOAMSTRUCT_LENGTH + 1
 	ld [wPlayerCurrentOAMSlot], a
 	ret

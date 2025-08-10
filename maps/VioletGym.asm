@@ -15,11 +15,11 @@ VioletGym_MapScriptHeader:
 	bg_event  6, 13, BGEVENT_READ, VioletGymStatue
 
 	def_object_events
-	object_event  4, 13, SPRITE_GYM_GUY, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, ObjectEvent, EVENT_DARK_CAVE_FALKNER
-	object_event  5,  1, SPRITE_FALKNER, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, VioletGymFalknerScript, EVENT_VIOLET_GYM_FALKNER
-	object_event  7,  6, SPRITE_BIRD_KEEPER, SPRITEMOVEDATA_STANDING_LEFT, 0, 2, -1, 0, OBJECTTYPE_GENERICTRAINER, 3, GenericTrainerBird_keeperRod, EVENT_VIOLET_GYM_FALKNER
-	object_event  2, 10, SPRITE_BIRD_KEEPER, SPRITEMOVEDATA_STANDING_RIGHT, 0, 2, -1, 0, OBJECTTYPE_GENERICTRAINER, 3, GenericTrainerBird_keeperAbe, EVENT_VIOLET_GYM_FALKNER
-	object_event  7, 13, SPRITE_GYM_GUY, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, VioletGymGuyScript, EVENT_VIOLET_GYM_FALKNER
+	object_event  4, 13, SPRITE_GYM_GUY, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, ObjectEvent, EVENT_DARK_CAVE_FALKNER
+	object_event  5,  1, SPRITE_FALKNER, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, VioletGymFalknerScript, EVENT_VIOLET_GYM_FALKNER
+	object_event  7,  6, SPRITE_BIRD_KEEPER, SPRITEMOVEDATA_STANDING_LEFT, 0, 2, -1, -1, 0, OBJECTTYPE_GENERICTRAINER, 3, GenericTrainerBird_keeperRod, EVENT_VIOLET_GYM_FALKNER
+	object_event  2, 10, SPRITE_BIRD_KEEPER, SPRITEMOVEDATA_STANDING_RIGHT, 0, 2, -1, -1, 0, OBJECTTYPE_GENERICTRAINER, 3, GenericTrainerBird_keeperAbe, EVENT_VIOLET_GYM_FALKNER
+	object_event  7, 13, SPRITE_GYM_GUY, SPRITEMOVEDATA_STANDING_DOWN, 0, 0, -1, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, VioletGymGuyScript, EVENT_VIOLET_GYM_FALKNER
 
 	object_const_def
 	const VIOLETGYM_GYM_GUY2
@@ -52,7 +52,10 @@ VioletGymFalknerScript:
 	reloadmapafterbattle
 	setevent EVENT_BEAT_FALKNER
 	opentext
-	givebadge ZEPHYRBADGE, JOHTO_REGION
+	writetext ReceivedZephyrBadgeText
+	playsound SFX_GET_BADGE
+	waitsfx
+	setflag ENGINE_ZEPHYRBADGE
 .FightDone:
 	checkevent EVENT_GOT_TM31_ROOST
 	iftrue_jumpopenedtext FalknerFightDoneText
@@ -91,7 +94,7 @@ VioletGymGuyScript:
 	jumptextfaceplayer VioletGymGuyText
 
 VioletGymStatue:
-	gettrainername FALKNER, 1, STRING_BUFFER_4
+	gettrainername FALKNER, 1, $1
 	checkflag ENGINE_ZEPHYRBADGE
 	iftruefwd .Beaten
 	jumpstd gymstatue1
@@ -136,6 +139,11 @@ FalknerWinLossText:
 	para "It's the official"
 	line "#mon League"
 	cont "Zephyr Badge."
+	done
+
+ReceivedZephyrBadgeText:
+	text "<PLAYER> received"
+	line "the Zephyr Badge."
 	done
 
 FalknerZephyrBadgeText:

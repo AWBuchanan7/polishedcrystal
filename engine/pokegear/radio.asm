@@ -19,7 +19,7 @@ PlayRadioShow:
 	ld a, [wCurRadioLine]
 	call StackJumpTable
 
-.Jumptable:
+RadioJumptable:
 ; entries correspond to constants/radio_constants.asm
 	table_width 2
 	dw OaksPkmnTalk1  ; $00
@@ -134,13 +134,17 @@ PrintRadioLine:
 	cp 2
 	jr nc, .print
 	inc hl
+	ld [hl], "<START>"
 	inc a
 	ld [wNumRadioLinesPrinted], a
 	cp 2
 	jr nz, .print
-	dec hl
+	bccoord TEXTBOX_INNERX, TEXTBOX_INNERY + 2
+	call PlaceWholeStringInBoxAtOnce
+	jr .skip
 .print
 	call PrintTextboxText
+.skip
 	ld a, RADIO_SCROLL
 	ld [wCurRadioLine], a
 	ld a, 100
@@ -158,7 +162,7 @@ RadioScroll:
 	ld a, [wNextRadioLine]
 	ld [wCurRadioLine], a
 	ld a, [wNumRadioLinesPrinted]
-	dec a
+	cp 1
 	call nz, CopyBottomLineToTopLine
 	jmp ClearBottomLine
 
@@ -651,11 +655,11 @@ CopyBottomLineToTopLine:
 ClearBottomLine:
 	hlcoord 1, 15
 	ld bc, SCREEN_WIDTH - 2
-	ld a, ' '
+	ld a, " "
 	rst ByteFill
 	hlcoord 1, 16
 	ld bc, SCREEN_WIDTH - 2
-	ld a, ' '
+	ld a, " "
 	rst ByteFill
 	ret
 
@@ -740,22 +744,24 @@ CopyDexEntry:
 CopyDexEntryParts:
 	push af
 	push hl
-	ld de, wPokedexShowNextLine+1
+	ld de, wPokedexShowPointerBank
 	ld bc, SCREEN_WIDTH - 1
 	call FarCopyBytes
-	ld hl, wPokedexShowNextLine
-	push hl
-	ld [hl], '<LINE>'
+	ld hl, wPokedexShowPointerAddr
+	ld a, "<START>"
+	ld [hli], a
+	ld a, "<LINE>"
+	ld [hli], a
 	ld d, BANK(@)
-	call .GetTerminator
+	call .CopyLine
 	dec hl
-	ld [hl], '<DONE>'
-	pop hl
+	ld [hl], "<DONE>"
+	ld hl, wPokedexShowPointerAddr
 	call CopyRadioTextToRAM
 	pop hl
 	pop af
 	ld d, a
-	call .GetTerminator
+	call .CopyLine
 	ld a, l
 	ld [wPokedexShowPointerAddr], a
 	ld a, h
@@ -764,15 +770,15 @@ CopyDexEntryParts:
 	ld [wPokedexShowPointerBank], a
 	ret
 
-.GetTerminator:
+.CopyLine:
 	ld a, d
 	call GetFarByte
 	inc hl
-	cp '@'
+	cp "@"
 	ret z
-	cp '<NEXT>'
+	cp "<NEXT>"
 	ret z
-	jr .GetTerminator
+	jr .CopyLine
 
 PokedexShowText:
 	; @ @
@@ -937,7 +943,7 @@ LuckyNumberShow8:
 	ld de, wLuckyIDNumber
 	lb bc, PRINTNUM_LEADINGZEROS | 2, 5
 	call PrintNum
-	ld a, '@'
+	ld a, "@"
 	ld [wStringBuffer1 + 5], a
 	ld hl, LC_Text8
 	ld a, LUCKY_NUMBER_SHOW_9
@@ -1102,9 +1108,8 @@ PeoplePlaces4: ; People
 	pop bc
 	jr c, PeoplePlaces4
 	push bc
-	ld a, c
-	ld [wNamedObjectIndex], a
-	call GetTrainerClassName
+	farcall GetTrainerClassName
+	ld de, wStringBuffer1
 	call CopyName1
 	pop bc
 	ld b, 1
@@ -1562,7 +1567,7 @@ GetBuenasPassword:
 .read_loop
 	ld a, [de]
 	inc de
-	cp '@'
+	cp "@"
 	jr nz, .read_loop
 	dec c
 	jr nz, .read_loop
@@ -1573,7 +1578,7 @@ GetBuenasPassword:
 	ld a, [de]
 	inc de
 	ld [hli], a
-	cp '@'
+	cp "@"
 	jr nz, .copy_loop
 	ld de, wStringBuffer1
 	ret
@@ -1796,17 +1801,12 @@ BuenaOffTheAirText:
 
 CopyRadioTextToRAM:
 	ld a, [hl]
-	cp '<FAR>'
+	cp "<FAR>"
 	jmp z, FarCopyRadioText
-	ld de, wRadioCompressedText
+	ld de, wRadioText
 	ld bc, SCREEN_WIDTH * 2
 	rst CopyBytes
-	ld hl, wRadioCompressedText
-	ld de, wRadioText
-	ld a, [hli]
-	ld [de], a
-	inc de
-	jmp DecompressStringToRAM
+	ret
 
 StartRadioStation:
 	ld a, [wNumRadioLinesPrinted]

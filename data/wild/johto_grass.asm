@@ -1376,22 +1376,22 @@
 	db 10 percent, 10 percent, 10 percent ; encounter rates: morn/day/nite
 	; morn
 	wildmon 3, LEDYBA
-	wildmon 3, TEDDIURSA
-	wildmon 4, STANTLER
+	wildmon 3, CATERPIE
+	wildmon 4, CATERPIE
 	wildmon 4, PIDGEY
-	wildmon 3, POLIWAG
-	wildmon 4, TEDDIURSA
-	wildmon 4, STANTLER
+	wildmon 3, WEEDLE
+	wildmon 4, HOPPIP
+	wildmon 4, HOPPIP
 	; day
 	wildmon 3, PIDGEY
-	wildmon 3, TEDDIURSA
-	wildmon 4, STANTLER
+	wildmon 3, CATERPIE
+	wildmon 4, CATERPIE
 	wildmon 4, PIDGEY
-	wildmon 3, LEDYBA
-	wildmon 4, TEDDIURSA
-	wildmon 4, STANTLER
+	wildmon 3, WEEDLE
+	wildmon 4, HOPPIP
+	wildmon 4, HOPPIP
 	; nite
-	wildmon 3, TEDDIURSA
+	wildmon 3, SPINARAK
 	wildmon 3, HOOTHOOT
 	wildmon 4, POLIWAG
 	wildmon 4, HOOTHOOT
@@ -1404,22 +1404,22 @@
 	db 10 percent, 10 percent, 10 percent ; encounter rates: morn/day/nite
 	; morn
 	wildmon 4, LEDYBA
-	wildmon 4, TEDDIURSA
+	wildmon 4, CATERPIE
 	wildmon 5, BELLSPROUT
 	wildmon 5, PIDGEY
-	wildmon 4, TEDDIURSA
-	wildmon 5, STANTLER
-	wildmon 5, STANTLER
+	wildmon 4, WEEDLE
+	wildmon 5, HOPPIP
+	wildmon 5, HOPPIP
 	; day
 	wildmon 4, PIDGEY
-	wildmon 4, TEDDIURSA
+	wildmon 4, CATERPIE
 	wildmon 5, BELLSPROUT
 	wildmon 5, PIDGEY
-	wildmon 4, TEDDIURSA
-	wildmon 5, STANTLER
-	wildmon 5, STANTLER
+	wildmon 4, WEEDLE
+	wildmon 5, HOPPIP
+	wildmon 5, HOPPIP
 	; nite
-	wildmon 4, TEDDIURSA
+	wildmon 4, SPINARAK
 	wildmon 4, POLIWAG
 	wildmon 5, BELLSPROUT
 	wildmon 5, HOOTHOOT

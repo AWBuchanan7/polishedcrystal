@@ -18,10 +18,10 @@ LoadWeatherPal::
 	assert OW_WEATHER_SANDSTORM == 4
 	jr .sandstorm
 .snow
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wOBPals1)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	; we are not loading an official palette,
 	; so this tells dynamic pals to not associate this
 	; palette with a sprite.
@@ -38,7 +38,7 @@ LoadWeatherPal::
 	ldh [hCGBPalUpdate], a
 .skip_apply
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ret
 
 .rain

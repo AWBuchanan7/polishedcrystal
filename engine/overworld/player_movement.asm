@@ -23,15 +23,15 @@ DoPlayerMovement::
 	ret z
 
 	ld c, a
-	and PAD_CTRL_PAD
+	and D_PAD
 	ret nz
 
 	ld a, c
-	and PAD_B ; holding b will brake
+	and B_BUTTON ; holding b will brake
 	ret nz
 
 	ld a, c
-	or PAD_DOWN
+	or D_DOWN
 	ld [wCurInput], a
 	ret
 
@@ -627,13 +627,13 @@ DoPlayerMovement::
 	ld hl, .forced_dpad
 	add hl, de
 	ld a, [wCurInput]
-	and PAD_BUTTONS
+	and BUTTONS
 	or [hl]
 	ld [wCurInput], a
 	ret
 
 .forced_dpad
-	db PAD_DOWN, PAD_UP, PAD_LEFT, PAD_RIGHT
+	db D_DOWN, D_UP, D_LEFT, D_RIGHT
 
 .GetAction:
 ; Poll player input and update movement info.
@@ -641,13 +641,13 @@ DoPlayerMovement::
 	ld hl, .table
 	ld de, .table2 - .table1
 	ld a, [wCurInput]
-	bit B_PAD_DOWN, a
+	bit D_DOWN_F, a
 	jr nz, .d_down
-	bit B_PAD_UP, a
+	bit D_UP_F, a
 	jr nz, .d_up
-	bit B_PAD_LEFT, a
+	bit D_LEFT_F, a
 	jr nz, .d_left
-	bit B_PAD_RIGHT, a
+	bit D_RIGHT_F, a
 	jr nz, .d_right
 ; Standing
 	jr .update
@@ -674,7 +674,7 @@ DoPlayerMovement::
 	ld l, a
 if DEF(DEBUG)
 	ldh a, [hJoyDown]
-	or ~(PAD_A | PAD_B)
+	or ~(A_BUTTON | B_BUTTON)
 	inc a
 	ld a, [hl]
 	jr nz, .no_wtw
@@ -840,12 +840,12 @@ endc
 	push hl
 	ld hl, wOptions2
 	ldh a, [hJoypadDown]
-	and PAD_B
+	and B_BUTTON
 
 	; We want to return z on success, not nz.
 	cpl
 
-	; PAD_B is bit 1, RUNNING_SHOES is bit 3
+	; B_BUTTON is bit 1, RUNNING_SHOES is bit 3
 	add a
 	add a
 	xor [hl]
@@ -1034,13 +1034,13 @@ AnyFacingPlayerDistance:
 
 	ldh a, [hJoypadDown]
 	ld bc, 0
-	bit B_PAD_DOWN, a
+	bit D_DOWN_F, a
 	jr nz, .down
-	bit B_PAD_UP, a
+	bit D_UP_F, a
 	jr nz, .up
-	bit B_PAD_LEFT, a
+	bit D_LEFT_F, a
 	jr nz, .left
-	bit B_PAD_RIGHT, a
+	bit D_RIGHT_F, a
 	jr nz, .right
 .down
 	inc b

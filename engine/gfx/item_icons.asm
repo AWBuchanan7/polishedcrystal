@@ -53,7 +53,7 @@ _UpdateKeyItemIcon:
 LoadApricornIconForOverworld:
 	ld hl, ApricornIcon
 	lb bc, BANK(ApricornIcon), 9
-	ld de, vTiles0 tile '▲'
+	ld de, vTiles0 tile "▲"
 	jmp DecompressRequest2bpp
 
 LoadItemIconForOverworld::
@@ -65,18 +65,7 @@ DecompressItemIconForOverworld::
 	call FarDecompressWRA6InB
 	call WhiteOutDecompressedItemIconCorners
 	pop bc
-	ld hl, vTiles0 tile '▲'
-	ld de, wDecompressScratch
-	jmp Request2bppInWRA6
-
-LoadItemIconForSummaryScreen::
-	ld hl, ItemIconPointers
-	call _SetupLoadItemOrKeyItemIcon
-	push bc
-	call FarDecompressWRA6InB
-	call WhiteOutDecompressedItemIconCorners
-	pop bc
-	ld hl, vTiles2 tile SUMMARY_TILE_ITEM
+	ld hl, vTiles0 tile "▲"
 	ld de, wDecompressScratch
 	jmp Request2bppInWRA6
 
@@ -144,13 +133,6 @@ WhiteOutDecompressedItemIconCorners:
 	ld [hl], a
 	ret
 
-ShowSpecialItemIcon::
-	ld a, [wCurSpecialItem]
-	ld hl, SpecialItemIconPointers
-	call _LoadItemOrKeyItemIconForOverworld
-	farcall LoadSpecialItemIconPalette
-	jr PrintOverworldItemIcon
-
 ShowParkBallIcon::
 	ld hl, ParkBallIcon
 	lb bc, BANK(ParkBallIcon), 9
@@ -181,7 +163,7 @@ ShowTMHMIcon::
 	; fallthrough
 PrintOverworldItemIcon:
 	call SetDefaultBGPAndOBP
-	ld a, '▲'
+	ld a, "▲"
 	hlcoord 16, 13
 	ld [hli], a
 	inc a

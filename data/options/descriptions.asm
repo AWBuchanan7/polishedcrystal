@@ -6,7 +6,7 @@ InitialOptionDescriptions:
 	dw .InitialOptionDesc_Abilities
 	dw .InitialOptionDesc_PSS
 	dw .InitialOptionDesc_EVs
-	dw .InitialOptionDesc_Experience
+	dw .InitialOptionDesc_ExpScaling
 	dw .InitialOptionDesc_AffectionBonus
 	dw .InitialOptionDesc_NextPage
 
@@ -66,31 +66,18 @@ InitialOptionDescriptions:
 	line "erience in Gen 3."
 	prompt
 
-.InitialOptionDesc_Experience:
-	text "The old experience"
-	line "gain formula, in"
+.InitialOptionDesc_ExpScaling:
+	text "Experience gain"
+	line "is greater from"
 
-	para "Gen 1 to Gen 4,"
-	line "was unscaled."
-
-	para "The new one, in"
-	line "Gen 5 and reintro-"
-	cont "duced in Gen 7,"
-
-	para "gives more Exp. by"
-	line "defeating higher-"
-	cont "leveled foes,"
+	para "defeating higher-"
+	line "leveled foes,"
 
 	para "and less from low-"
 	line "er leveled ones."
 
-	para "Exp. gain can also"
-	line "be turned off for"
-	cont "a challenge, but"
-
-	para "Exp.Candy and Rare"
-	line "Candy will still"
-	cont "work if you do so."
+	para "Introduced in"
+	line "Gen 5 and 7."
 	prompt
 
 .InitialOptionDesc_AffectionBonus:
@@ -149,7 +136,7 @@ InitialOptionDescriptions:
 	line "will obey you and"
 	cont "can be nicknamed,"
 
-	para "but Exp.Points"
+	para "but Exp. Points"
 	line "won't be boosted."
 	prompt
 

@@ -957,7 +957,7 @@ BattleAnimFunction_RazorLeaf:
 	ret
 
 .three
-	ld a, BATTLEANIMFRAMESET_RAZOR_LEAF_1
+	ld a, BATTLEANIMFRAMESET_16
 	call FarReinitBattleAnimFrameset
 	ld hl, BATTLEANIMSTRUCT_OAMFLAGS
 	add hl, bc
@@ -1174,7 +1174,7 @@ BattleAnimFunction_Surf:
 .zero
 	call BattleAnim_IncAnonJumptableIndex
 	ld hl, rIE
-	set B_IE_STAT, [hl]
+	set LCD_STAT, [hl]
 	ld a, LOW(rSCY)
 	ldh [hLCDCPointer], a
 	ld a, $58
@@ -1233,7 +1233,7 @@ BattleAnimFunction_Surf:
 	cp $70
 	jr c, .move_down
 	ld hl, rIE
-	res B_IE_STAT, [hl]
+	res LCD_STAT, [hl]
 	xor a
 	ldh [hLCDCPointer], a
 	ldh [hLYOverrideStart], a
@@ -2795,9 +2795,8 @@ BattleAnimFunction_PetalDance:
 	ld hl, BATTLEANIMSTRUCT_VAR2
 	add hl, bc
 	ld a, [hl]
-	cp $30
+	cp $28
 	jr nc, .end
-	inc [hl]
 	inc [hl]
 	ret
 

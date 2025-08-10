@@ -82,7 +82,7 @@ SpecialNameRival:
 	jmp InitName
 
 .DefaultRivalName:
-	rawchar "Silver@"
+	db "Silver@"
 
 SpecialTrendyPhrase:
 	ld b, $3 ; trendy phrase
@@ -94,7 +94,7 @@ SpecialTrendyPhrase:
 	jmp InitName
 
 .DefaultTrendyPhrase:
-	rawchar "Nothing@"
+	db "Nothing@"
 
 SpecialNameRater:
 	farjp NameRater
@@ -131,7 +131,7 @@ BugContestJudging:
 	jr .finish
 .firstplace
 	ld hl, .FirstPlacePrizes
-	call GetValueByTimeOfDay
+	call GetHourIntervalValue
 	jr .finish
 .secondplace
 	ld a, EVERSTONE
@@ -143,10 +143,11 @@ BugContestJudging:
 	ret
 
 .FirstPlacePrizes:
-	db SHINY_STONE ; morn
-	db SUN_STONE   ; day
-	db DUSK_STONE  ; eve
-	db MOON_STONE  ; nite
+	db MORN_HOUR, MOON_STONE
+	db DAY_HOUR,  SHINY_STONE
+	db EVE_HOUR,  SUN_STONE
+	db NITE_HOUR, DUSK_STONE
+	db -1,        MOON_STONE
 
 MapRadio:
 	ldh a, [hScriptVar]
@@ -237,9 +238,15 @@ Special_CheckLuckyNumberShowFlag:
 SpecialCheckPokerus:
 ; Check if a monster in your party has Pokerus
 	farcall CheckPokerus
-	; a = carry ? TRUE : FALSE
-	sbc a
-	and TRUE
+	; fallthrough
+
+ScriptReturnCarry:
+	jr c, .carry
+	xor a
+	ldh [hScriptVar], a
+	ret
+.carry
+	ld a, 1
 	ldh [hScriptVar], a
 	ret
 
@@ -290,7 +297,7 @@ PlayCurMonCry:
 	ld c, a
 	ld a, [wCurForm]
 	ld b, a
-	jmp PlayMonCry
+	jmp PlayCry
 
 Special_FadeOutMusic:
 	xor a ; MUSIC_NONE
@@ -335,7 +342,7 @@ CheckIfTrendyPhraseIsLucky:
 	ret
 
 .KeyPhrase:
-	rawchar "Lucky@"
+	db "Lucky@"
 
 RespawnOneOffs:
 	eventflagreset EVENT_BEAT_FLANNERY
@@ -367,12 +374,6 @@ RespawnOneOffs:
 	jr nz, .CaughtSudowoodo
 	eventflagreset EVENT_ROUTE_36_SUDOWOODO
 .CaughtSudowoodo
-
-	ld de, ENGINE_PLAYER_CAUGHT_BLOODMOON_URSALUNA
-	farcall EngineFlagAction
-	jr nz, .CaughtBloodmoonUrsaluna
-	eventflagreset EVENT_MURKY_SWAMP_BLOODMOON_URSALUNA
-.CaughtBloodmoonUrsaluna
 
 	ld de, ENGINE_PLAYER_CAUGHT_ARTICUNO
 	farcall EngineFlagAction

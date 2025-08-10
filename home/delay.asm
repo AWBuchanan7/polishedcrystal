@@ -16,12 +16,10 @@ ApplyTilemapInVBlank::
 _ApplyAttrOrTilemapInVBlank:
 	ldh [hBGMapMode], a
 
-; TODO: Update the audio engine so we can remove the calls to SFXDelay* routines,
-; without causing odd button sounds when the artifical delays are gone.
-
 SFXDelay2::
 Delay2::
 	ld c, 2
+
 SFXDelayFrames::
 DelayFrames::
 ; Wait c frames
@@ -30,6 +28,7 @@ DelayFrames::
 	jr nz, DelayFrames
 	ret
 
+SFXDelayFrame::
 DelayFrame::
 ; Wait for one frame
 	ldh a, [rLY]

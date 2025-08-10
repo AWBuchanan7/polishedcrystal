@@ -435,7 +435,7 @@ SilphCoMart:
 	db MAX_POTION
 	db MAX_REPEL
 	db DREAM_BALL
-	db UPGRADE
+	db UP_GRADE
 	db DUBIOUS_DISC
 	db -1
 

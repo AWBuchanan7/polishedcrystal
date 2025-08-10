@@ -256,9 +256,9 @@ Printer_WaitHandshake:
 	ld [wPrinterOpcode], a
 	ld a, $88
 	ldh [rSB], a
-	ld a, SC_INTERNAL
+	ld a, (0 << rSC_ON) | (1 << rSC_CLOCK)
 	ldh [rSC], a
-	ld a, SC_START | SC_INTERNAL
+	ld a, (1 << rSC_ON) | (1 << rSC_CLOCK)
 	ldh [rSC], a
 	ret
 
@@ -403,7 +403,7 @@ Printer_Get2bpp:
 	jr nc, .loop
 	call SwapHLDE
 	ld bc, 16
-	rst CopyBytes
+	call CopyBytes
 	reti
 
 PrinterDataPacket1:
@@ -568,9 +568,9 @@ Printer_Send0x08:
 
 Printer_SerialSend:
 	ldh [rSB], a
-	ld a, SC_INTERNAL
+	ld a, (0 << rSC_ON) | (1 << rSC_CLOCK)
 	ldh [rSC], a
-	ld a, SC_START | SC_INTERNAL
+	ld a, (1 << rSC_ON) | (1 << rSC_CLOCK)
 	ldh [rSC], a
 	ret
 
@@ -603,11 +603,11 @@ AskSerial::
 	ldh [rSB], a
 
 ; switch to internal clock
-	ld a, SC_INTERNAL
+	ld a, (0 << rSC_ON) | (1 << rSC_CLOCK)
 	ldh [rSC], a
 
 ; start transfer
-	ld a, SC_START | SC_INTERNAL
+	ld a, (1 << rSC_ON) | (1 << rSC_CLOCK)
 	ldh [rSC], a
 
 	ret

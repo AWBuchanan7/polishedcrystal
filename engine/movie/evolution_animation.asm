@@ -70,7 +70,7 @@ EvolutionAnimation:
 	ld a, [hli]
 	ld c, a
 	ld b, [hl]
-	call PlayMonCry
+	call PlayCry
 
 .skip_cry
 	ld e, MUSIC_EVOLUTION
@@ -186,7 +186,7 @@ EvolutionAnimation:
 	ld a, [hli]
 	ld c, a
 	ld b, [hl]
-	jmp PlayMonCry
+	jmp PlayCry
 
 .GetColoredCGBLayout:
 	ld c, FALSE
@@ -268,7 +268,7 @@ EvolutionAnimation:
 	call JoyTextDelay
 	ldh a, [hJoyDown]
 	pop bc
-	and PAD_B
+	and B_BUTTON
 	jr nz, .pressed_b
 .loop3
 	dec c

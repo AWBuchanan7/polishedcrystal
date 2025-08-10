@@ -283,7 +283,7 @@ AIWantsSwitchCheck:
 	ret z ; We can't switch
 
 	ld a, [wEnemyPerishCount]
-	dec a
+	cp 1
 	ld a, [wEnemyAISwitchScore]
 	jr nz, .no_perish
 

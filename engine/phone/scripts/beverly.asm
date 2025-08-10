@@ -1,16 +1,16 @@
 BeverlyPhoneScript1:
-	gettrainername POKEFANF, BEVERLY1, STRING_BUFFER_3
+	gettrainername POKEFANF, BEVERLY1, $0
 	farscall PhoneScript_AnswerPhone_Female
 	checkflag ENGINE_BEVERLY_HAS_NUGGET
 	iftruefwd .HasNugget
 	farsjump BeverlyHangUpScript
 
 .HasNugget:
-	getlandmarkname NATIONAL_PARK, STRING_BUFFER_5
+	getlandmarkname NATIONAL_PARK, $2
 	farsjump BeverlyComePickUpScript
 
 BeverlyPhoneScript2:
-	gettrainername POKEFANF, BEVERLY1, STRING_BUFFER_3
+	gettrainername POKEFANF, BEVERLY1, $0
 	farscall PhoneScript_GreetPhone_Female
 	checkflag ENGINE_BEVERLY_HAS_NUGGET
 	iftruefwd .HasNugget
@@ -22,5 +22,5 @@ BeverlyPhoneScript2:
 
 .FoundNugget:
 	setflag ENGINE_BEVERLY_HAS_NUGGET
-	getlandmarkname NATIONAL_PARK, STRING_BUFFER_5
+	getlandmarkname NATIONAL_PARK, $2
 	farsjump PhoneScript_FoundItem_Female

@@ -26,6 +26,12 @@ BattleCommand_falseswipe:
 	dec a
 	ld [de], a
 .okay
+	ld a, [wCriticalHit]
+	cp $2
+	jr nz, .carry
+	xor a
+	ld [wCriticalHit], a
+.carry
 	scf
 	ret
 

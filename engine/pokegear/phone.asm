@@ -18,17 +18,17 @@ PokegearPhone_Init:
 PokegearPhone_Joypad:
 	ld hl, hJoyPressed
 	ld a, [hl]
-	and PAD_B
+	and B_BUTTON
 	jr nz, .b
 	ld a, [hl]
-	and PAD_A
+	and A_BUTTON
 	jr nz, .a
 	ld hl, hJoyLast
 	ld a, [hl]
-	and PAD_LEFT
+	and D_LEFT
 	jr nz, .left
 	ld a, [hl]
-	and PAD_RIGHT
+	and D_RIGHT
 	jr nz, .right
 	jmp PokegearPhone_GetDPad
 
@@ -66,7 +66,7 @@ PokegearPhone_Joypad:
 	ld a, [wPokegearPhoneCursorPosition]
 	ld bc, 20 * 2
 	rst AddNTimes
-	ld [hl], '▷'
+	ld [hl], "▷"
 	call PokegearPhoneContactSubmenu
 	jr c, .quit_submenu
 	ld hl, wJumptableIndex
@@ -131,7 +131,7 @@ PokegearPhone_MakePhoneCall:
 
 PokegearPhone_FinishPhoneCall:
 	ldh a, [hJoyPressed]
-	and PAD_A | PAD_B
+	and A_BUTTON | B_BUTTON
 	ret z
 	call HangUp
 	ld a, POKEGEARSTATE_PHONEJOYPAD
@@ -142,10 +142,10 @@ PokegearPhone_FinishPhoneCall:
 PokegearPhone_GetDPad:
 	ld hl, hJoyLast
 	ld a, [hl]
-	and PAD_UP
+	and D_UP
 	jr nz, .up
 	ld a, [hl]
-	and PAD_DOWN
+	and D_DOWN
 	jr nz, .down
 	ret
 
@@ -198,7 +198,7 @@ PokegearPhone_GetDPad:
 PokegearPhone_UpdateDisplayList:
 	hlcoord 1, 3
 	ld b, 9
-	ld a, ' '
+	ld a, " "
 .row
 	ld c, 18
 .col
@@ -234,7 +234,7 @@ PokegearPhone_UpdateDisplayList:
 	jr c, .loop
 	; fallthrough
 PokegearPhone_UpdateCursor:
-	ld a, ' '
+	ld a, " "
 	hlcoord 1, 4
 	ld [hl], a
 	hlcoord 1, 6
@@ -247,7 +247,7 @@ PokegearPhone_UpdateCursor:
 	ld a, [wPokegearPhoneCursorPosition]
 	ld bc, 2 * SCREEN_WIDTH
 	rst AddNTimes
-	ld [hl], '▶'
+	ld [hl], "▶"
 	ret
 
 PokegearPhone_DeletePhoneNumber:
@@ -346,13 +346,13 @@ PokegearPhoneContactSubmenu:
 	pop de
 	ld hl, hJoyPressed
 	ld a, [hl]
-	and PAD_UP
+	and D_UP
 	jr nz, .d_up
 	ld a, [hl]
-	and PAD_DOWN
+	and D_DOWN
 	jr nz, .d_down
 	ld a, [hl]
-	and PAD_A | PAD_B
+	and A_BUTTON | B_BUTTON
 	jr nz, .a_b
 	call DelayFrame
 	jr .loop
@@ -385,7 +385,7 @@ PokegearPhoneContactSubmenu:
 	ldh [hBGMapMode], a
 	pop hl
 	ldh a, [hJoyPressed]
-	and PAD_B
+	and B_BUTTON
 	jr nz, .Cancel
 	ld a, [wPokegearPhoneSubmenuCursor]
 	jmp JumpTable
@@ -428,7 +428,7 @@ PokegearPhoneContactSubmenu:
 	ld a, [de]
 	ld c, a
 	push hl
-	ld a, ' '
+	ld a, " "
 	ld de, SCREEN_WIDTH * 2
 .clear_column
 	ld [hl], a
@@ -439,7 +439,7 @@ PokegearPhoneContactSubmenu:
 	ld a, [wPokegearPhoneSubmenuCursor]
 	ld bc, SCREEN_WIDTH  * 2
 	rst AddNTimes
-	ld [hl], '▶'
+	ld [hl], "▶"
 	pop de
 	ret
 

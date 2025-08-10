@@ -2,6 +2,7 @@ DerekCheekPinchingText:
 	text "Listen to this."
 	line "My "
 	text_ram wStringBuffer4
+	text ""
 
 	para "grins happily when"
 	line "I pinch its cheek."

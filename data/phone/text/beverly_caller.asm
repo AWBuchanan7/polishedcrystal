@@ -77,5 +77,6 @@ BeverlyComePickUpText:
 
 	para "in "
 	text_ram wStringBuffer5
+	text ""
 	line "when you can."
 	done

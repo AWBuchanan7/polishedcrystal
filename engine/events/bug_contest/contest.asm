@@ -99,17 +99,7 @@ _BugContestJudging:
 	call GetPokemonName
 	ld hl, BugContest_FirstPlaceText
 	call PrintText
-	ld hl, wBugContestThirdPlacePersonID
-	ld de, -5
-	ld b, 3
-.loop
-	ld a, [hl]
-	dec a ; Player = 1
-	ret z
-	add hl, de
-	dec b
-	jr nz, .loop
-	ret
+	jmp BugContest_GetPlayersResult
 
 BugContest_FirstPlaceText:
 	text_far ContestJudging_FirstPlaceText
@@ -168,14 +158,14 @@ LoadContestantName:
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-; Copy the Trainer Class to [wNamedObjectIndex].
+; Copy the Trainer Class to c.
 	ld a, [hli]
-	ld [wNamedObjectIndex], a
+	ld c, a
 ; Save hl and bc for later.
 	push hl
 	push bc
 ; Get the Trainer Class name and copy it into wBugContestWinnerName.
-	call GetTrainerClassName
+	farcall GetTrainerClassName
 	ld hl, wStringBuffer1
 	ld de, wBugContestWinnerName
 	ld bc, TRAINER_CLASS_NAME_LENGTH
@@ -184,10 +174,10 @@ LoadContestantName:
 ; Delete the trailing terminator and replace it with a space.
 .next
 	ld a, [hli]
-	cp '@'
+	cp "@"
 	jr nz, .next
 	dec hl
-	ld a, ' '
+	ld a, " "
 	ld [hli], a
 	ld d, h
 	ld e, l
@@ -214,6 +204,19 @@ LoadContestantName:
 	ret
 
 INCLUDE "data/events/bug_contest_winners.asm"
+
+BugContest_GetPlayersResult:
+	ld hl, wBugContestThirdPlacePersonID
+	ld de, -5
+	ld b, 3
+.loop
+	ld a, [hl]
+	cp 1 ; Player
+	ret z
+	add hl, de
+	dec b
+	jr nz, .loop
+	ret
 
 ClearContestResults:
 	ld hl, wBugContestResults

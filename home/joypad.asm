@@ -30,7 +30,7 @@ Joypad::
 
 ; We can only get four inputs at a time.
 ; We take d-pad first for no particular reason.
-	ld a, JOYP_GET_CTRL_PAD
+	ld a, R_DPAD
 	ldh [rJOYP], a
 ; Read twice to give the request time to take.
 	ldh a, [rJOYP]
@@ -47,7 +47,7 @@ Joypad::
 
 ; Buttons make 8 total inputs (A, B, Select, Start).
 ; We can fit this into one byte.
-	ld a, JOYP_GET_BUTTONS
+	ld a, R_BUTTONS
 	ldh [rJOYP], a
 ; Wait for input to stabilize.
 rept 6
@@ -89,7 +89,7 @@ endr
 ; Now that we have the input, we can do stuff with it.
 
 ; For example, soft reset:
-	or ~PAD_BUTTONS
+	or ~(A_BUTTON | B_BUTTON | SELECT | START)
 	inc a
 	jmp z, SoftReset
 
@@ -252,51 +252,45 @@ StopAutoInput::
 JoyWaitAorB::
 .loop
 	call DelayFrame
-	call JoyCheckTextAdvance
+	call GetJoypad
+	ldh a, [hJoyPressed]
+	and A_BUTTON | B_BUTTON
+	ret nz
+	call CheckAutoscroll
 	ret nz
 	call RTC
 	jr .loop
 
-JoyCheckTextAdvance::
-; Returns nz if prompt should advance (usually with A or B).
-	call GetJoypad
-	ldh a, [hJoyPressed]
-	jr _Autoscroll
-
-CheckIfAOrBPressed::
+CheckIfAOrBPressed:
 	call JoyTextDelay
 	ldh a, [hJoyLast]
 _Autoscroll:
-	and PAD_A | PAD_B
+	and A_BUTTON | B_BUTTON
 	ret nz
-
+	; fallthrough
+CheckAutoscroll:
+; Returns nz if we should autoscroll
 	ld a, [wOptions1]
 	and AUTOSCROLL_MASK
 	ret z
 
-	push hl
-	call .do_it
-	pop hl
-	ret
-
-.do_it
-	ld hl, hJoyDown
 	cp AUTOSCROLL_START
+	ldh a, [hJoyDown]
 	jr z, .start
-	cp AUTOSCROLL_B
-	jr z, .b
 
-	; A or B
-	ld a, [hl]
-	and PAD_A | PAD_B
+	; Check A+B. If both are held, autoscroll for both A&B and A|B.
+	; Otherwise, autoscroll if the option is set to A or B, not A and B
+	and A_BUTTON | B_BUTTON
+	ret z
+	cp A_BUTTON | B_BUTTON
+	jr z, _Autoscroll
+	ld a, [wOptions1]
+	; nz if AORB, z if AANDB
+	and %100
 	ret
 
 .start
-	bit B_PAD_START, [hl]
-	ret
-
-.b
-	bit B_PAD_B, [hl]
+	and START
 	ret
 
 Script_waitbutton::
@@ -372,6 +366,13 @@ WaitPressAorB_BlinkCursor::
 	ldh [hMapObjectIndexBuffer], a
 	ret
 
+SimpleWaitPressAorB::
+.loop
+	call CheckIfAOrBPressed
+	ret nz
+	call DelayFrame
+	jr .loop
+
 ButtonSound::
 	ld a, [wLinkMode]
 	and a
@@ -416,13 +417,13 @@ ButtonSound::
 
 .autoinput_a
 	db NO_INPUT, $50
-	db PAD_A, $00
+	db A_BUTTON, $00
 	db NO_INPUT, $ff ; end
 
 .blink_cursor
 	ldh a, [hVBlankCounter]
 	and %00010000 ; bit 4, a
-	ld a, '▼'
+	ld a, "▼"
 	jr nz, .load_cursor_state
 	ld a, [wTilemap + 17 + 17 * SCREEN_WIDTH]
 .load_cursor_state
@@ -433,7 +434,7 @@ BlinkCursor::
 	push bc
 	ld a, [hl]
 	ld b, a
-	ld a, '▼'
+	ld a, "▼"
 	cp b
 	pop bc
 	jr nz, .place_arrow
@@ -445,7 +446,7 @@ BlinkCursor::
 	dec a
 	ldh [hObjectStructIndexBuffer], a
 	ret nz
-	ld [hl], '━'
+	ld [hl], "━"
 	ld a, -1
 	ldh [hMapObjectIndexBuffer], a
 	ld a, 6
@@ -467,5 +468,5 @@ BlinkCursor::
 	ret nz
 	ld a, 6
 	ldh [hObjectStructIndexBuffer], a
-	ld [hl], '▼'
+	ld [hl], "▼"
 	ret

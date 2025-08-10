@@ -74,7 +74,7 @@ DoEncoreDisable:
 	ld a, b
 	cp DISABLE
 	ld hl, WasDisabledText
-	ld a, 5
+	ld a, 4
 	jr z, .got_text_and_duration
 	ld hl, GotAnEncoreText
 	dec a
@@ -100,7 +100,7 @@ DoEncoreDisable:
 
 .failed
 	; Cursed Body prints nothing in this case.
-	ld a, [wInAbility]
+	ld a, [wAnimationsDisabled]
 	and a
 	ret nz
 

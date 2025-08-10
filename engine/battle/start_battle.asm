@@ -64,12 +64,8 @@ PlayBattleMusic:
 	jr nz, .trainermusic
 
 	ld a, [wTempEnemyMonSpecies]
-	ld c, a
-	ld a, [wTempEnemyMonForm]
-	and SPECIESFORM_MASK
-	ld b, a
 	ld hl, BattleMusic_Legendaries
-	call .loadfromwordarray
+	call .loadfromarray
 	jr c, .done
 
 	; Are we in the Safari Game?
@@ -97,9 +93,10 @@ PlayBattleMusic:
 	cp GIOVANNI
 	jr nz, .othertrainer
 	ld a, [wOtherTrainerID]
-	dec a ; Armored Mewtwo = GIOVANNI 1
+	cp 1 ; Armored Mewtwo
+	jr nz, .othertrainer
 	ld e, MUSIC_MOTHER_BEAST_BATTLE_SM
-	jr z, .done
+	jr .done
 
 .othertrainer
 	ld a, [wOtherTrainerClass]
@@ -139,14 +136,6 @@ PlayBattleMusic:
 	ld de, 2
 	call IsInArray
 	ret nc
-	jr .foundinarray
-
-.loadfromwordarray
-	ld de, 3
-	call IsInWordArray
-	ret nc
-	inc hl
-.foundinarray
 	inc hl
 	ld e, [hl]
 	ld d, 0
@@ -187,7 +176,7 @@ ClearBattleRAM:
 	ld [hl], a
 
 	ld [wMenuScrollPosition], a
-	ld [wMoveHitState], a
+	ld [wCriticalHit], a
 	ld [wBattleMonSpecies], a
 	ld [wCurBattleMon], a
 	ld [wTimeOfDayPal], a

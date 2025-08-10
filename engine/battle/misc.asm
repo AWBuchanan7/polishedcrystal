@@ -14,7 +14,6 @@ _CheckContactMove::
 	call GetBattleVar
 	cp STRUGGLE
 	ret nc
-	push af
 	ld hl, AbnormalContactMoves
 	call IsInByteArray
 	ld b, PHYSICAL
@@ -22,9 +21,8 @@ _CheckContactMove::
 	assert PHYSICAL + 1 == SPECIAL
 	inc b
 .not_abnormal
-	pop af
-	ld hl, Moves + MOVE_CATEGORY
-	call GetMoveProperty ; checks category properly even if PSS is off
+	ld a, BATTLE_VARS_MOVE_CATEGORY
+	call GetBattleVar
 	cp b
 	ret z
 	and a

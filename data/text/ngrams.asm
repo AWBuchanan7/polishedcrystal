@@ -1,72 +1,73 @@
 NgramStrings:
 	table_width 1
+	dr .e_
+	dr ._t
 	dr .ou
-	dr .th
 	dr .in
+	dr .th
+	dr .he
 	dr .t_
 	dr .er
-	dr .s_
-	dr .an
 	dr .on
-	dr .to_
-	dr .d_
-	dr .ea
-	dr .y_
-	dr .en
-	dr .or
-	dr .at
-	dr .$_
-	dr .ll
-	dr .I_
-	dr .ar
-	dr .it
-	dr .st
-	dr .ow
-	dr .ha
-	dr .a_
-	dr .om
-	dr .le
-	dr .of_
-	dr .se
 	dr .re
+	dr .s_
+	dr .at
+	dr .an
 	dr .to
-	dr .#s_
-	dr .Th
+	dr .ha
+	dr .ng
+	dr .it
 	dr .is
-	dr .ra
-	dr .ch
-	dr .I#m_
-	dr .o_
-	dr .gh
-	dr .es
-	dr .wa
-	dr .e@
-	dr .oo
-	dr .ck
+	dr .ea
+	dr .ve
+	dr .ar
+	dr .st
+	dr .le
+	dr .or
+	dr .te
+	dr .as
+	dr .yo
+	dr .y_
 	dr .r_
-	dr .l_
-	dr .be
-	dr .li
-	dr .ed
-	dr .us
-	dr .ti
-	dr ._you
-	dr .ing_
-	dr .the_
+	dr ._b
+	dr .en
+	dr .me
+	dr .e_t
+	dr .comma_
+	dr .es
+	dr .e_you
+	dr .se
+	dr .ne
+	dr ._h
+	dr .I_
+	dr .our
+	dr .You
+	dr .nd
+	dr .ow
+	dr ._c
+	dr ._wa
+	dr .ome
+	dr .are
+	dr .The
+	dr .t__s
+	dr .ut
+	dr .nt
+	dr .the
 	dr .you
 	dr .ing
-	dr .is_
-	dr .the
-	dr .You_
-	dr .er_
-	dr .with
-	dr .batt
+	dr .hat
+	dr .and
 	dr .for
-	dr .ve_
-	dr .ed_
-	dr .It#s_
-	dr .that_
-	dr .e_
+	dr .all
+	dr .here
+	dr .that
+	dr .have
+	dr .rain
+	dr .this
+	dr .ight
+	dr .with
+	dr .ould
+	dr .attle
 	dr .Poke
 	dr .Pokemon
 	assert_table_length NGRAMS_VAR_START - NGRAMS_START
@@ -79,72 +80,72 @@ NgramStrings:
 .Rival:   dw wRivalName
 .Trendy:  dw wTrendyPhrase
 .e_:      rawchar "e @"
+._t:      rawchar " t@"
 .ou:      rawchar "ou@"
-.th:      rawchar "th@"
 .in:      rawchar "in@"
+.th:      rawchar "th@"
+.he:      rawchar "he@"
 .t_:      rawchar "t @"
 .er:      rawchar "er@"
-.s_:      rawchar "s @"
-.an:      rawchar "an@"
 .on:      rawchar "on@"
-.to_:     rawchar "to @"
-.d_:      rawchar "d @"
-.ea:      rawchar "ea@"
-.y_:      rawchar "y @"
-.en:      rawchar "en@"
-.or:      rawchar "or@"
-.at:      rawchar "at@"
-.$_:      rawchar ", @"
-.ll:      rawchar "ll@"
-.I_:      rawchar "I @"
-.ar:      rawchar "ar@"
-.it:      rawchar "it@"
-.st:      rawchar "st@"
-.ow:      rawchar "ow@"
-.ha:      rawchar "ha@"
-.a_:      rawchar "a @"
-.om:      rawchar "om@"
-.le:      rawchar "le@"
-.of_:     rawchar "of @"
-.se:      rawchar "se@"
 .re:      rawchar "re@"
+.s_:      rawchar "s @"
+.at:      rawchar "at@"
+.an:      rawchar "an@"
 .to:      rawchar "to@"
-.#s_:     rawchar "'s @"
-.Th:      rawchar "Th@"
+.ha:      rawchar "ha@"
+.ng:      rawchar "ng@"
+.it:      rawchar "it@"
 .is:      rawchar "is@"
-.ra:      rawchar "ra@"
-.ch:      rawchar "ch@"
-.I#m_:    rawchar "I'm @"
-.o_:      rawchar "o @"
-.gh:      rawchar "gh@"
-.es:      rawchar "es@"
-.wa:      rawchar "wa@"
-.e@:      rawchar "e.@"
-.oo:      rawchar "oo@"
-.ck:      rawchar "ck@"
+.ea:      rawchar "ea@"
+.ve:      rawchar "ve@"
+.ar:      rawchar "ar@"
+.st:      rawchar "st@"
+.le:      rawchar "le@"
+.or:      rawchar "or@"
+.te:      rawchar "te@"
+.as:      rawchar "as@"
+.yo:      rawchar "yo@"
+.y_:      rawchar "y @"
 .r_:      rawchar "r @"
-.l_:      rawchar "l @"
-.be:      rawchar "be@"
-.li:      rawchar "li@"
-.ed:      rawchar "ed@"
-.us:      rawchar "us@"
-.ti:      rawchar "ti@"
-._you:    rawchar " you@"
-.ing_:    rawchar "ing @"
-.the_:    rawchar "the @"
+._b:      rawchar " b@"
+.en:      rawchar "en@"
+.me:      rawchar "me@"
+.e_t:     rawchar "e t@"
+.comma_:  rawchar ", @"
+.es:      rawchar "es@"
+.e_you:   rawchar "e you@"
+.se:      rawchar "se@"
+.ne:      rawchar "ne@"
+._h:      rawchar " h@"
+.I_:      rawchar "I @"
+.our:     rawchar "our@"
+.You:     rawchar "You@"
+.nd:      rawchar "nd@"
+.ow:      rawchar "ow@"
+._c:      rawchar " c@"
+._wa:     rawchar " wa@"
+.ome:     rawchar "ome@"
+.are:     rawchar "are@"
+.The:     rawchar "The@"
+.t__s:    rawchar "t's@"
+.ut:      rawchar "ut@"
+.nt:      rawchar "nt@"
+.the:     rawchar "the@"
 .you:     rawchar "you@"
 .ing:     rawchar "ing@"
-.is_:     rawchar "is @"
-.the:     rawchar "the@"
-.You_:    rawchar "You @"
-.er_:     rawchar "er @"
-.with:    rawchar "with@"
-.batt:    rawchar "batt@"
+.hat:     rawchar "hat@"
+.and:     rawchar "and@"
 .for:     rawchar "for@"
-.ve_:     rawchar "ve @"
-.ed_:     rawchar "ed @"
-.It#s_:   rawchar "It's @"
-.that_:   rawchar "that @"
-._you_:   rawchar " you @"
+.all:     rawchar "all@"
+.here:    rawchar "here@"
+.that:    rawchar "that@"
+.have:    rawchar "have@"
+.rain:    rawchar "rain@"
+.this:    rawchar "this@"
+.ight:    rawchar "ight@"
+.with:    rawchar "with@"
+.ould:    rawchar "ould@"
+.attle:   rawchar "attle@"
 .Poke:    rawchar "Poké@"
 .Pokemon: rawchar "Pokémon@"

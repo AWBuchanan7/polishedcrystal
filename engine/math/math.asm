@@ -101,9 +101,11 @@ Divide::
 	ld e, a
 	inc l
 .skip
-	dec b
+	ld a, b
+	cp 1
 	jr z, .done
 	sla l
+	dec b
 	jr .loop2
 .done
 	ld a, c

@@ -1,8 +1,8 @@
 ClearSavedObjPals::
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wUsedObjectPals)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	xor a
 	ld [wUsedObjectPals], a
@@ -12,7 +12,7 @@ ClearSavedObjPals::
 	rst ByteFill
 
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ret
 
 DisableDynPalUpdates::
@@ -43,10 +43,10 @@ CheckForUsedObjPals::
 	push bc
 	push af
 
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wUsedObjectPals)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	ld hl, wPalFlags
 	bit DISABLE_DYN_PAL_F, [hl]
@@ -74,7 +74,7 @@ CheckForUsedObjPals::
 
 .done
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	jmp PopAFBCDEHL
 
 ScanObjectStructPals:
@@ -100,12 +100,12 @@ ScanObjectStructPals:
 	; Then load the return into OBJECT_PALETTE, which corresponds
 	; to OBJ 0 - OBJ 7
 	jr nc, .skip
-	and OAM_PALETTE
+	and PALETTE_MASK
 	ld c, a
 	ld hl, OBJECT_PALETTE
 	add hl, de
 	ld a, [hl]
-	and ~OAM_PALETTE
+	and ~PALETTE_MASK
 	or c
 	ld [hl], a
 

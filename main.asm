@@ -235,7 +235,7 @@ SECTION "bank11", ROMX
 INCLUDE "engine/battle/ai/move.asm"
 INCLUDE "engine/pokemon/mail.asm"
 INCLUDE "engine/events/hidden_grottoes.asm"
-INCLUDE "data/pokemon/dex_entry_pointers.asm"
+INCLUDE "engine/pokedex/pokedex_2.asm"
 
 
 SECTION "Crystal Features 1", ROMX
@@ -269,7 +269,7 @@ INCLUDE "engine/events/pokerus/check_pokerus.asm"
 INCLUDE "engine/events/lucky_number.asm"
 INCLUDE "engine/pokemon/caught_data.asm"
 INCLUDE "engine/pokemon/search2.asm"
-INCLUDE "engine/pokemon/summary_screen.asm"
+INCLUDE "engine/pokemon/stats_screen.asm"
 INCLUDE "engine/events/catch_tutorial.asm"
 INCLUDE "engine/movie/evolution_animation.asm"
 INCLUDE "engine/movie/init_hof_credits.asm"
@@ -328,7 +328,6 @@ INCLUDE "engine/overworld/variables.asm"
 INCLUDE "data/text/battle.asm"
 INCLUDE "engine/battle/final_text.asm"
 INCLUDE "engine/battle/abilities.asm"
-INCLUDE "engine/battle/text.asm"
 
 
 SECTION "bank21", ROMX
@@ -678,7 +677,6 @@ SECTION "Item Text", ROMX
 
 INCLUDE "data/items/names.asm"
 INCLUDE "data/items/key_names.asm"
-INCLUDE "data/items/special_names.asm"
 INCLUDE "data/items/apricorn_names.asm"
 INCLUDE "engine/items/print_item_description.asm"
 
@@ -691,11 +689,6 @@ INCLUDE "data/pokemon/body_data.asm"
 SECTION "Pokemon Names", ROMX
 
 INCLUDE "data/pokemon/names.asm"
-
-
-SECTION "Badge Names", ROMX
-
-INCLUDE "data/events/badge_names.asm"
 
 
 SECTION "Move Names", ROMX

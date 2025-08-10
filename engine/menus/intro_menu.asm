@@ -37,7 +37,7 @@ _MainMenu:
 NewGame_ClearTileMapEtc:
 	xor a
 	ldh [hMapAnims], a
-	ld a, '<BLACK>'
+	ld a, "<BLACK>"
 	call FillTileMap
 	call LoadFrame
 	call LoadStandardFont
@@ -47,12 +47,15 @@ NewGamePlus:
 	ld hl, .text
 	call PrintText
 	call YesNoBox
-	jr c, _MainMenu
+	jr c, .no
 	xor a
 	ldh [hBGMapMode], a
 	farcall TryLoadSaveFile
 	ret c
 	jr _NewGame_FinishSetup
+
+.no
+	farjp _MainMenu
 
 .text
 	text "New Game+ will"
@@ -124,12 +127,8 @@ ResetWRAM_NotPlus:
 
 ResetWRAM:
 	ld hl, wShadowOAM
-	ld bc, wMusic - wShadowOAM
+	ld bc, wOptions3 - wShadowOAM
 	xor a
-	rst ByteFill
-
-	ld hl, wMusicEnd
-	ld bc, wOptions3 - wMusicEnd
 	rst ByteFill
 
 	ld hl, wRAM1Start
@@ -271,9 +270,9 @@ _ResetWRAM_InitList:
 
 InitializeMagikarpHouse:
 	ld hl, wBestMagikarpLengthMmHi
-	ld a, HIGH(BEST_MAGIKARP_LENGTH)
+	ld a, $3
 	ld [hli], a
-	ld a, LOW(BEST_MAGIKARP_LENGTH)
+	ld a, $6
 	ld [hli], a
 	ld de, .Ralph
 	jmp CopyName2
@@ -393,9 +392,9 @@ ConfirmContinue:
 	call DelayFrame
 	call GetJoypad
 	ld hl, hJoyPressed
-	bit B_PAD_A, [hl]
+	bit A_BUTTON_F, [hl]
 	ret nz
-	bit B_PAD_B, [hl]
+	bit B_BUTTON_F, [hl]
 	jr z, .loop
 	scf
 	ret
@@ -589,7 +588,7 @@ Continue_DisplayGameTime:
 	ld de, wGameTimeHours
 	lb bc, 2, 3
 	call PrintNum
-	ld a, ':'
+	ld a, ":"
 	ld [hli], a
 	ld de, wGameTimeMinutes
 	lb bc, PRINTNUM_LEADINGZEROS | 1, 2
@@ -699,8 +698,12 @@ ElmText1:
 ElmText2:
 	text_far _ElmText2
 	text_asm
-	lp bc, GLACEON
-	call PlayMonCry
+	xor a
+	ld [wStereoPanningMask], a
+	ld [wCryTracks], a
+	ld de, GLACEON - 1
+	call PlayCryHeader
+	call WaitSFX
 	ld hl, ElmText3
 	ret
 
@@ -763,7 +766,7 @@ InitGender:
 
 GenderMenu::
 	; erase previous cursors
-	ld a, ' '
+	ld a, " "
 	hlcoord 2, 3
 	ld [hli], a
 	ld [hl], a
@@ -830,7 +833,7 @@ GenderMenu::
 
 .ready
 	ld a, BANK(wPlayerGender)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	ld b, 1
 	call SafeCopyTilemapAtOnce
@@ -839,11 +842,11 @@ GenderMenu::
 	call DelayFrame
 	call GetJoypad
 	ldh a, [hJoyPressed]
-	bit B_PAD_A, a
+	bit A_BUTTON_F, a
 	ret nz
-	bit B_PAD_RIGHT, a
+	bit D_RIGHT_F, a
 	jr nz, .d_right
-	bit B_PAD_LEFT, a
+	bit D_LEFT_F, a
 	jr z, .loop
 
 	ld a, [wPlayerGender]
@@ -863,7 +866,7 @@ GenderMenu::
 
 .MakeTransparent:
 	ld a, BANK(wBGPals2)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ld d, 3
 .transparency_loop
 	ld a, [hli]
@@ -905,10 +908,10 @@ InitGenderGraphics:
 
 ; Shift the "▼" character three pixels to the right across two tiles
 	farcall LoadStandardFontPointer
-	ld de, ('▼' - $80) * TILE_1BPP_SIZE
+	ld de, ("▼" - $80) * LEN_1BPP_TILE
 	add hl, de
 	ld de, wOverworldMapBlocks
-	ld c, TILE_1BPP_SIZE
+	ld c, LEN_1BPP_TILE
 .loop
 	ld a, BANK(FontTiles)
 	call GetFarByte
@@ -919,7 +922,7 @@ rept 3
 endr
 	ld [de], a
 	push hl
-	ld hl, TILE_SIZE
+	ld hl, LEN_2BPP_TILE
 	add hl, de
 	ld [hl], b ; no-optimize *hl++|*hl-- = b|c|d|e
 	inc hl
@@ -1107,10 +1110,10 @@ CrystalIntroSequence:
 	farcall CrystalIntro
 
 StartTitleScreen:
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, $5
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	farcall _TitleScreen
 	call DelayFrame
@@ -1122,14 +1125,14 @@ StartTitleScreen:
 	call ClearBGPalettes
 
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	ld hl, rLCDC
-	res B_LCDC_OBJ_SIZE, [hl]
+	res rLCDC_SPRITE_SIZE, [hl]
 	call ClearScreen
 	call ApplyAttrAndTilemapInVBlank
 	ld hl, rIE
-	res B_IE_STAT, [hl]
+	res LCD_STAT, [hl]
 	xor a
 	ldh [hLCDCPointer], a
 	ldh [hSCX], a
@@ -1217,7 +1220,7 @@ TitleScreenEntrance:
 	inc [hl]
 
 	ld hl, rIE
-	res B_IE_STAT, [hl]
+	res LCD_STAT, [hl]
 	xor a
 	ldh [hLCDCPointer], a
 
@@ -1294,25 +1297,25 @@ TitleScreenMain:
 
 ; Save data can be deleted by pressing Up + B + Select.
 	ld a, [hl]
-	or ~(PAD_UP + PAD_B + PAD_SELECT)
+	or ~(D_UP + B_BUTTON + SELECT)
 	inc a
 	jr z, .delete_save_data
 
 ; The clock can be reset by pressing Down + B.
 	ld a, [hl]
-	or ~(PAD_DOWN + PAD_B)
+	or ~(D_DOWN + B_BUTTON)
 	inc a
 	jr z, .clock_reset
 
 ; The early game options can be reset by pressing Left + B.
 	ld a, [hl]
-	or ~(PAD_LEFT + PAD_B)
+	or ~(D_LEFT + B_BUTTON)
 	inc a
 	jr z, .early_option_reset
 
 ; Press Start or A to start the game.
 	ld a, [hl]
-	and PAD_START | PAD_A
+	and START | A_BUTTON
 	jr nz, .start_game
 	ret
 
@@ -1400,15 +1403,13 @@ Copyright:
 
 CopyrightString:
 	; ©1995-2001 Nintendo
-	db $60, $61, $62, $63, $64, $65, $66
-	db $67, $68, $69, $6a, $6b, $6c
+	db   $60, $61, $62, $63, $64, $65, $66
+	db   $67, $68, $69, $6a, $6b, $6c
 
 	; ©1995-2001 Creatures inc.
-	db "<NEXT>"
-	db $60, $61, $62, $63, $64, $65, $66
-	db $6d, $6e, $6f, $70, $71, $72, $7a, $7b, $7c
+	next $60, $61, $62, $63, $64, $65, $66
+	db   $6d, $6e, $6f, $70, $71, $72, $7a, $7b, $7c
 
 	; ©1995-2001 GAME FREAK inc.
-	db "<NEXT>"
-	db $60, $61, $62, $63, $64, $65, $66
-	db $73, $74, $75, $76, $77, $78, $79, $7a, $7b, $7c, "@"
+	next $60, $61, $62, $63, $64, $65, $66
+	db   $73, $74, $75, $76, $77, $78, $79, $7a, $7b, $7c, "@"

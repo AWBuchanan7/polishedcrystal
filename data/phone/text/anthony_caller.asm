@@ -26,6 +26,7 @@ AnthonyDefeatedMonText:
 
 	para "wild "
 	text_ram wStringBuffer4
+	text ""
 	line "quite often."
 
 	para "They're easily"
@@ -77,11 +78,13 @@ AnthonySwarmText:
 	para "I took a hike in"
 	line ""
 	text_ram wStringBuffer5
+	text ""
 	cont "yesterday, see?"
 
 	para "Well, there were"
 	line "tons of "
 	text_ram wStringBuffer4
+	text ""
 
 	para "around! You have"
 	line "to see it!"
@@ -89,6 +92,7 @@ AnthonySwarmText:
 	para "I get this feeling"
 	line "that "
 	text_ram wStringBuffer4
+	text ""
 
 	para "may be timid."
 	line "I didn't see any"

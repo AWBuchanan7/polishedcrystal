@@ -339,7 +339,7 @@ CheckTileEvent:
 RenderShamoutiCoastSand:
 	call GetBGMapPlayerOffset
 	ld de, wFootprintQueue
-	ld bc, TILEMAP_WIDTH
+	ld bc, BG_MAP_WIDTH
 
 	; assume coast sand is tile $1:4f in TILESET_SHAMOUTI_ISLAND;
 	; footprint tiles must be in the same VRAM bank
@@ -519,7 +519,7 @@ OWPlayerInput:
 
 CheckAPressOW:
 	ldh a, [hJoyPressed]
-	and PAD_A
+	and A_BUTTON
 	ret z
 	call TryObjectEvent
 	ret c
@@ -545,6 +545,7 @@ TryObjectEvent:
 	farcall CheckFacingObject
 	ret nc
 
+	call PlayTalkObject
 	ldh a, [hObjectStructIndexBuffer]
 	call GetObjectStruct
 	ld hl, OBJECT_MAP_OBJECT_INDEX
@@ -557,20 +558,12 @@ TryObjectEvent:
 	add hl, bc
 	ld a, [hl]
 
-	; failsafe
 	cp NUM_OBJECT_TYPES
 	ret nc
 
-	cp SILENT_OBJECT_TYPES
-	jr nc, .skip_click_sfx
-	push af
-	call PlayTalkObject
-	pop af
-.skip_click_sfx
-
 	call StackJumpTable
 
-.Jumptable:
+ObjectEventTypeArray:
 	table_width 2
 	dw .script   ; OBJECTTYPE_SCRIPT
 	dw .itemball ; OBJECTTYPE_ITEMBALL
@@ -578,8 +571,6 @@ TryObjectEvent:
 	dw .trainer  ; OBJECTTYPE_GENERICTRAINER
 	dw .pokemon  ; OBJECTTYPE_POKEMON
 	dw .command  ; OBJECTTYPE_COMMAND
-	dw .script   ; OBJECTTYPE_SCRIPT_SILENT
-	dw DoNothing ; OBJECTTYPE_DONOTHING
 	assert_table_length NUM_OBJECT_TYPES
 
 .script:
@@ -863,9 +854,9 @@ CheckMenuOW:
 	jr nz, .PanningAroundSnowtopMountain
 
 	ldh a, [hJoyPressed]
-	bit B_PAD_SELECT, a
+	bit SELECT_F, a
 	jr nz, .Select
-	bit B_PAD_START, a
+	bit START_F, a
 	jr nz, .Start
 
 	xor a
@@ -887,7 +878,7 @@ CheckMenuOW:
 
 .PanningAroundSnowtopMountain:
 	ldh a, [hJoyPressed]
-	and PAD_B
+	and B_BUTTON
 	ret z
 	ld a, BANK(SnowtopMountainOutsideStopPanningScript)
 	ld hl, SnowtopMountainOutsideStopPanningScript

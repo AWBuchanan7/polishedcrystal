@@ -21,6 +21,7 @@ WadeDefeatedMonText:
 	text "Oh yeah, we KO'd a"
 	line "wild "
 	text_ram wStringBuffer4
+	text ""
 
 	para "with one hit a"
 	line "while back."

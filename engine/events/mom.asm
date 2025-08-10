@@ -94,11 +94,11 @@ Special_BankOfMom:
 	call CloseWindow
 	jr c, .cancel
 	ld a, [wMenuCursorY]
-	dec a ; 1?
+	cp $1
 	jr z, .withdraw
-	dec a ; 2?
+	cp $2
 	jr z, .deposit
-	dec a ; 3?
+	cp $3
 	jr z, .stopsaving
 
 .cancel
@@ -444,17 +444,17 @@ Mom_WithdrawDepositMenuJoypad:
 	call JoyTextDelay
 	ld hl, hJoyPressed
 	ld a, [hl]
-	and PAD_B
+	and B_BUTTON
 	jr nz, .pressedB
 	ld a, [hl]
-	and PAD_A
+	and A_BUTTON
 	jr nz, .pressedA
 	call .dpadaction
 	xor a
 	ldh [hBGMapMode], a
 	hlcoord 11, 6
 	ld bc, 8
-	ld a, ' '
+	ld a, " "
 	rst ByteFill
 	hlcoord 11, 6
 	ld de, wStringBuffer2
@@ -468,7 +468,7 @@ Mom_WithdrawDepositMenuJoypad:
 	ld c, a
 	ld b, 0
 	add hl, bc
-	ld [hl], ' '
+	ld [hl], " "
 
 .skip
 	call ApplyTilemapInVBlank
@@ -485,16 +485,16 @@ Mom_WithdrawDepositMenuJoypad:
 .dpadaction
 	ld hl, hJoyLast
 	ld a, [hl]
-	and PAD_UP
+	and D_UP
 	jr nz, .incrementdigit
 	ld a, [hl]
-	and PAD_DOWN
+	and D_DOWN
 	jr nz, .decrementdigit
 	ld a, [hl]
-	and PAD_LEFT
+	and D_LEFT
 	jr nz, .movecursorleft
 	ld a, [hl]
-	and PAD_RIGHT
+	and D_RIGHT
 	jr nz, .movecursorright
 	and a
 	ret

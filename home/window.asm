@@ -77,14 +77,14 @@ ClearSpritesUnderTextbox::
 	ld de, wShadowOAM
 	ld h, d
 	ld l, e
-	ld c, OAM_COUNT
+	ld c, NUM_SPRITE_OAM_STRUCTS
 .loop
 	; check if YCoord ≥ (TEXTBOX_Y + 1) * TILE_WIDTH
 	ld a, [hl]
 	cp (TEXTBOX_Y + 1) * TILE_WIDTH
 	jr nc, .clear_sprite
 .next
-	ld hl, OBJ_SIZE
+	ld hl, SPRITEOAMSTRUCT_LENGTH
 	add hl, de
 	ld e, l
 	dec c

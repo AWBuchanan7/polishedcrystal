@@ -1192,12 +1192,12 @@ FlickeringCaveEntrancePalette:
 	cp DARKNESS_PALSET
 	ret nz
 
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wBGPals1)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
-	ld a, BGPI_AUTOINC | (0 palette 4)
+	ld a, %10100000 ; auto-increment, index $20 (pal 4 color 0)
 	ldh [rBGPI], a
 
 	ldh a, [hVBlankCounter]
@@ -1213,7 +1213,7 @@ FlickeringCaveEntrancePalette:
 	ldh [rBGPD], a
 
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ret
 
 TowerPillarTilePointer1:  dw vTiles2 tile $2d, TowerPillarTile1

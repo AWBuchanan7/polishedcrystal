@@ -53,7 +53,7 @@ _PrintDiploma:
 	push af
 	xor a
 	ldh [rIF], a
-	ld a, IE_SERIAL | IE_VBLANK
+	ld a, (1 << SERIAL) | (1 << VBLANK)
 	ldh [rIE], a
 
 	ld hl, hVBlank
@@ -104,7 +104,7 @@ _PrintDiploma:
 
 CheckCancelPrint:
 	ldh a, [hJoyDown]
-	and PAD_B
+	and B_BUTTON
 	jr nz, .loop
 	and a
 	ret
@@ -118,9 +118,9 @@ CheckCancelPrint:
 	ld [wPrinterOpcode], a
 	ld a, $88
 	ldh [rSB], a
-	ld a, SC_INTERNAL
+	ld a, (0 << rSC_ON) | (1 << rSC_CLOCK)
 	ldh [rSC], a
-	ld a, SC_START | SC_INTERNAL
+	ld a, (1 << rSC_ON) | (1 << rSC_CLOCK)
 	ldh [rSC], a
 .loop2
 	ld a, [wPrinterOpcode]
@@ -135,7 +135,7 @@ CheckCancelPrint:
 Printer_CopyTilemapToBuffer:
 	hlcoord 0, 0
 	ld de, wPrinterTilemapBuffer
-	ld bc, SCREEN_AREA
+	ld bc, SCREEN_WIDTH * SCREEN_HEIGHT
 	jmp CopyBytes
 
 Printer_ResetJoypadRegisters:
@@ -210,7 +210,7 @@ PlacePrinterStatusString:
 	rst PlaceString
 	hlcoord 2, 15
 	ld de, String_PressBToCancel
-	rst PlaceString
+	call PlaceString
 	ld a, $1
 	ldh [hBGMapMode], a
 	xor a

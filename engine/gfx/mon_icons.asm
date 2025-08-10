@@ -68,10 +68,10 @@ SetTradeMiniIconColor:
 	ld a, [wCurIconForm]
 	ld b, a
 	farcall GetMonPalInBCDE
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wOBPals1)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ld hl, wOBPals1 palette 1 + 5
 	ld a, d
 	ld [hld], a
@@ -82,7 +82,7 @@ SetTradeMiniIconColor:
 	ld [hl], c
 	farcall ApplyOBPals
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ld a, TRUE
 	ldh [hCGBPalUpdate], a
 	ld a, 1 ; OBJ 1
@@ -162,16 +162,16 @@ SetOWFlyMonColor:
 	farcall CopySpritePal
 	pop bc
 	ldh a, [hUsedOAMIndex]
-	cp (OAM_COUNT - NUM_FLYFROM_ANIM_OAMS - 1) * OBJ_SIZE
+	cp (NUM_SPRITE_OAM_STRUCTS - NUM_FLYFROM_ANIM_OAMS - 1) * SPRITEOAMSTRUCT_LENGTH
 	; if we didn't have enough OAM slots, we need to use the last NUM_FLYFROM_ANIM_OAMS slots
-	ld a, (OAM_COUNT - NUM_FLYFROM_ANIM_OAMS) * OBJ_SIZE
+	ld a, (NUM_SPRITE_OAM_STRUCTS - NUM_FLYFROM_ANIM_OAMS) * SPRITEOAMSTRUCT_LENGTH
 	jr nc, .got_oam_addr
 	ldh a, [hUsedOAMIndex]
-	; a = (OAM_COUNT - NUM_FLYFROM_ANIM_OAMS) * OBJ_SIZE + 1
+	; a = (NUM_SPRITE_OAM_STRUCTS - NUM_FLYFROM_ANIM_OAMS) * SPRITEOAMSTRUCT_LENGTH + 1
 	cpl
-	add (OAM_COUNT - NUM_FLYFROM_ANIM_OAMS) * OBJ_SIZE + 1
+	add (NUM_SPRITE_OAM_STRUCTS - NUM_FLYFROM_ANIM_OAMS) * SPRITEOAMSTRUCT_LENGTH + 1
 .got_oam_addr
-	ld hl, wShadowOAM + OAMA_FLAGS
+	ld hl, wShadowOAM + SPRITEOAMSTRUCT_ATTRIBUTES
 	add l
 	ld l, a
 	ld a, c
@@ -440,7 +440,7 @@ SetPartyMonMiniAnimSpeed:
 	ld hl, wPartyMon1Happiness
 	call GetPartyLocation
 	ld a, [hl]
-; same happiness thresholds as EggSummaryScreen
+; same happiness thresholds as EggStatsScreen
 	ld d, 0
 	cp $6
 	jr c, .gotindex

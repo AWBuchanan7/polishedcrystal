@@ -1,5 +1,5 @@
 BethPhoneScript1:
-	gettrainername COOLTRAINERF, BETH1, STRING_BUFFER_3
+	gettrainername COOLTRAINERF, BETH1, $0
 	checkflag ENGINE_BETH_READY_FOR_REMATCH
 	iftruefwd .WantsBattle
 	farscall PhoneScript_AnswerPhone_Female
@@ -14,11 +14,11 @@ BethPhoneScript1:
 	farsjump BethHangUpScript
 
 .WantsBattle:
-	getlandmarkname ROUTE_26, STRING_BUFFER_5
+	getlandmarkname ROUTE_26, $2
 	farsjump BethBattleReminderScript
 
 BethPhoneScript2:
-	gettrainername COOLTRAINERF, BETH1, STRING_BUFFER_3
+	gettrainername COOLTRAINERF, BETH1, $0
 	farscall PhoneScript_GreetPhone_Female
 	checkflag ENGINE_BETH_READY_FOR_REMATCH
 	iftruefwd .Generic
@@ -34,6 +34,6 @@ BethFridayAfternoon:
 	setflag ENGINE_BETH_FRIDAY_AFTERNOON
 
 BethWantsBattle:
-	getlandmarkname ROUTE_26, STRING_BUFFER_5
+	getlandmarkname ROUTE_26, $2
 	setflag ENGINE_BETH_READY_FOR_REMATCH
 	farsjump PhoneScript_WantsToBattle_Female

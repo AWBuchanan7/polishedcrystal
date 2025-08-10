@@ -246,9 +246,9 @@ StandardMart:
 	call VerticalMenu
 	jr c, .quit
 	ld a, [wMenuCursorY]
-	dec a ; 1?
+	cp $1
 	jr z, .buy
-	dec a ; 2?
+	cp $2
 	jr z, .sell
 .quit
 	ld a, $4 ;  Come again!
@@ -447,12 +447,12 @@ GetMartPrice:
 .CharToNybble:
 	ld a, [de]
 	inc de
-	cp ' '
+	cp " "
 	jr nz, .not_space
-	ld a, '0'
+	ld a, "0"
 
 .not_space
-	sub '0'
+	sub "0"
 	ret
 
 BuyMenu:
@@ -585,9 +585,9 @@ MartAskPurchaseQuantity:
 	inc hl
 	inc hl
 	ld a, [hl]
-	and a ; 0?
+	and a
 	jmp z, StandardMartAskPurchaseQuantity
-	dec a ; 1?
+	cp 1
 	jmp z, BargainShopAskPurchaseQuantity
 	jmp RooftopSaleAskPurchaseQuantity
 
@@ -720,7 +720,7 @@ BuyMenuLoop:
 	call DoMartScrollingMenu
 	call SpeechTextbox
 	ld a, [wMenuJoypad]
-	cp PAD_B
+	cp B_BUTTON
 	jmp z, MartMenuLoop_SetCarry
 	call MartAskPurchaseQuantity
 	jr c, .cancel
@@ -783,7 +783,7 @@ ExpCandyBuyMenuLoop:
 	call DoMartScrollingMenu
 	call SpeechTextbox
 	ld a, [wMenuJoypad]
-	cp PAD_B
+	cp B_BUTTON
 	jmp z, MartMenuLoop_SetCarry
 	call MartAskPurchaseQuantity
 	jr c, .cancel
@@ -832,7 +832,7 @@ BuyTMMenuLoop:
 	call DoMartScrollingMenu
 	call SpeechTextbox
 	ld a, [wMenuJoypad]
-	cp PAD_B
+	cp B_BUTTON
 	jmp z, MartMenuLoop_SetCarry
 	call TMMartAskPurchaseQuantity
 	jr c, .cancel
@@ -863,7 +863,7 @@ BlueCardBuyMenuLoop:
 	call DoMartScrollingMenu
 	call SpeechTextbox
 	ld a, [wMenuJoypad]
-	cp PAD_B
+	cp B_BUTTON
 	jmp z, MartMenuLoop_SetCarry
 	call MartConfirmPurchase
 	jr c, .cancel
@@ -893,7 +893,7 @@ BTBuyMenuLoop:
 	call DoMartScrollingMenu
 	call SpeechTextbox
 	ld a, [wMenuJoypad]
-	cp PAD_B
+	cp B_BUTTON
 	jr z, MartMenuLoop_SetCarry
 	call BTMartAskPurchaseQuantity
 	jr c, .cancel
@@ -1364,7 +1364,7 @@ Text_AdventurerMart_HowMany:
 Text_InformalMart_HowMany:
 Text_BazaarMart_HowMany:
 	; How many?
-	text_far _HowManyText
+	text_far _PharmacyHowManyText
 	text_end
 
 Text_Pharmacy_CostsThisMuch:

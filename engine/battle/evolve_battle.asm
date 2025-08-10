@@ -10,9 +10,8 @@ EvolveDuringBattle::
 	farcall CheckHowToEvolve
 	ret z
 
-	call LoadTileMapToTempTileMap
 	ld a, BANK("Sound Stack")
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ld hl, wSoundEngineBackup
 	ld de, wSoundEngineBattleBackup
 	ld bc, wChannelsEnd - wMusic + 1
@@ -26,13 +25,14 @@ EvolveDuringBattle::
 	rst CopyBytes
 	ei
 	ld a, $1
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	farcall TryToEvolve
 	jr c, .canceled
 
 	call .load_mon_data
-	xor a
+
+	call ResetPlayerAbility
 	jr .done
 
 .load_mon_data
@@ -87,7 +87,6 @@ EvolveDuringBattle::
 
 .canceled
 	farcall CancelEvolution
-	scf
 
 .done
 	ld a, [wCurPartyMon]
@@ -95,12 +94,13 @@ EvolveDuringBattle::
 	ld a, [wCurBattleMon]
 	ld [wCurPartyMon], a
 	call .load_mon_data
+	call ResetPlayerAbility
 	pop af
 	ld [wCurPartyMon], a
 
-	push af ; preserve carry flag from evolution result
+
 	ld a, BANK("Sound Stack")
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ld a, [wBackupMapMusic]
 	ld [wMapMusic], a
 	di
@@ -114,26 +114,6 @@ EvolveDuringBattle::
 	ld bc, wChannelsEnd - wMusic + 1
 	rst CopyBytes
 	ld a, $1
-	ldh [rWBK], a
-	call UpdatePlayerHPPal
-	call _LoadBattleFontsHPBar
-	call GetMonBackpic
-	call LoadTempTileMapToTileMap
-	call UpdatePlayerHUD
-	ld a, $31
-	ldh [hGraphicStartTile], a
-	hlcoord 2, 6
-	lb bc, 6, 6
-	predef PlaceGraphic
-	call EmptyBattleTextbox
-	pop af
-	ret c ; cancelled, so don't re-run entry abilities
+	ldh [rSVBK], a
 
-	; Only run this if we are evolving the current battler.
-	ld b, a
-	ld a, [wCurBattleMon]
-	cp b
-	ret nz
-
-	call ResetPlayerAbility
-	farjp RunEntryAbilitiesInner
+	ret

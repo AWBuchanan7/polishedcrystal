@@ -98,7 +98,7 @@ UseRegisteredItem:
 	xor a
 	ld [wUsingItemWithSelect], a
 	ld a, [wItemEffectSucceeded]
-	dec a ; TRUE?
+	cp 1
 	jr nz, ._cantuse
 	scf
 	ld a, HMENURETURN_SCRIPT
@@ -130,12 +130,12 @@ GetRegisteredItem:
 	call FarCopyColorWRAM
 
 	hlcoord 0, 0, wAttrmap
-	ld a, OAM_PRIO | PAL_BG_TEXT
+	ld a, PRIORITY | PAL_BG_TEXT
 	ld bc, SCREEN_WIDTH * 4
 	rst ByteFill
 
 	hlcoord 0, 0
-	ld a, ' '
+	ld a, " "
 	ld bc, SCREEN_WIDTH * 4
 	rst ByteFill
 
@@ -189,19 +189,19 @@ GetRegisteredItem:
 	jr .joy_loop
 
 .got_input
-	bit B_PAD_A, a
+	bit A_BUTTON_F, a
 	jr nz, .first
-	and PAD_B | PAD_SELECT | PAD_START
+	and B_BUTTON | SELECT | START
 	jr nz, .cancel
 	ld de, wRegisteredItems
 	ld a, [hl]
-	bit B_PAD_UP, a
+	bit D_UP_F, a
 	jr nz, .got_item
 	inc de
-	bit B_PAD_LEFT, a
+	bit D_LEFT_F, a
 	jr nz, .got_item
 	inc de
-	bit B_PAD_RIGHT, a
+	bit D_RIGHT_F, a
 	jr nz, .got_item
 	inc de
 .got_item
@@ -236,10 +236,10 @@ endr
 	jr .joy_loop
 
 .RegisteredItemText:
-	db "▲ -<LNBRK>"
-	db "◀ -<LNBRK>"
-	db "▶ -<LNBRK>"
-	db "▼ -@"
+	db    "▲ -"
+	next1 "◀ -"
+	next1 "▶ -"
+	next1 "▼ -@"
 
 InvertedTextPalette:
 INCLUDE "gfx/overworld/register_item.pal"

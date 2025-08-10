@@ -12,9 +12,9 @@ GoldenrodFlowerShop_MapScriptHeader:
 	def_bg_events
 
 	def_object_events
-	object_event  2,  4, SPRITE_POKEFAN_F, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, FlowerShopTeacherScript, -1
-	object_event  5,  6, SPRITE_CUTE_GIRL, SPRITEMOVEDATA_WANDER, 1, 1, -1, PAL_NPC_BLUE, OBJECTTYPE_SCRIPT, 0, FlowerShopFloriaScript, EVENT_FLORIA_AT_FLOWER_SHOP
-	object_event  6,  3, SPRITE_GENTLEMAN, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, 0, OBJECTTYPE_COMMAND, jumptextfaceplayer, FlowerShopGentlemanText, EVENT_FLORIA_AT_SUDOWOODO
+	object_event  2,  4, SPRITE_POKEFAN_F, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, FlowerShopTeacherScript, -1
+	object_event  5,  6, SPRITE_CUTE_GIRL, SPRITEMOVEDATA_WANDER, 1, 1, -1, -1, PAL_NPC_BLUE, OBJECTTYPE_SCRIPT, 0, FlowerShopFloriaScript, EVENT_FLORIA_AT_FLOWER_SHOP
+	object_event  6,  3, SPRITE_GENTLEMAN, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, -1, 0, OBJECTTYPE_COMMAND, jumptextfaceplayer, FlowerShopGentlemanText, EVENT_FLORIA_AT_SUDOWOODO
 
 	object_const_def
 	const GOLDENRODFLOWERSHOP_TEACHER
@@ -64,19 +64,19 @@ FlowerShopTeacherScript:
 	jumpopenedtext DontBuyMulchText
 
 .Buy1:
-	checkmoney YOUR_MONEY, 200
-	ifequalfwd HAVE_LESS, .NotEnoughMoney
+	checkmoney $0, 200
+	ifequalfwd $2, .NotEnoughMoney
 	giveitem MULCH
 	iffalse_jumpopenedtext NoRoomForMulchText
-	takemoney YOUR_MONEY, 200
+	takemoney $0, 200
 	sjumpfwd .Done
 
 .Buy10:
-	checkmoney YOUR_MONEY, 2000
-	ifequalfwd HAVE_LESS, .NotEnoughMoney
+	checkmoney $0, 2000
+	ifequalfwd $2, .NotEnoughMoney
 	giveitem MULCH, 10
 	iffalse_jumpopenedtext NoRoomForMulchText
-	takemoney YOUR_MONEY, 2000
+	takemoney $0, 2000
 
 .Done:
 	special PlaceMoneyTopRight

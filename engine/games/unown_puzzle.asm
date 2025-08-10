@@ -26,7 +26,7 @@ UnownPuzzle:
 	call Decompress
 	call LoadUnownPuzzlePiecesGFX
 	hlcoord 0, 0
-	ld bc, SCREEN_AREA
+	ld bc, SCREEN_WIDTH * SCREEN_HEIGHT
 	ld a, PUZZLE_BORDER
 	rst ByteFill
 	hlcoord 4, 3
@@ -44,7 +44,7 @@ UnownPuzzle:
 	ld [wHoldingUnownPuzzlePiece], a
 	ld [wUnownPuzzleCursorPosition], a
 	ld [wUnownPuzzleHeldPiece], a
-	ld a, LCDC_ON | LCDC_WIN_9800 | LCDC_WIN_OFF | LCDC_BLOCK01 | LCDC_BG_9800 | LCDC_OBJ_8 | LCDC_OBJ_ON | LCDC_PRIO_ON
+	ld a, (1 << rLCDC_ENABLE) | (1 << rLCDC_TILE_DATA) | (1 << rLCDC_SPRITES_ENABLE) | (1 << rLCDC_BG_PRIORITY)
 	ldh [rLCDC], a
 	call ApplyTilemapInVBlank
 	ld a, CGB_UNOWN_PUZZLE
@@ -167,23 +167,23 @@ PlaceStartCancelBoxBorder:
 
 _UnownPuzzle:
 	ldh a, [hJoyPressed]
-	and PAD_START
+	and START
 	jmp nz, UnownPuzzle_Quit
 	ldh a, [hJoyPressed]
-	and PAD_A
+	and A_BUTTON
 	jmp nz, UnownPuzzle_A
 	ld hl, hJoyLast
 	ld a, [hl]
-	and PAD_UP
+	and D_UP
 	jr nz, .d_up
 	ld a, [hl]
-	and PAD_DOWN
+	and D_DOWN
 	jr nz, .d_down
 	ld a, [hl]
-	and PAD_LEFT
+	and D_LEFT
 	jr nz, .d_left
 	ld a, [hl]
-	and PAD_RIGHT
+	and D_RIGHT
 	jr nz, .d_right
 	ret
 
@@ -317,20 +317,13 @@ UnownPuzzle_A:
 	ld de, SFX_1ST_PLACE
 	call PlaySFX
 	call WaitSFX
-	call UnownPuzzle_WaitPressAorB
+	call SimpleWaitPressAorB
 	ld a, TRUE
 	ld [wSolvedUnownPuzzle], a
 UnownPuzzle_Quit:
 	ld hl, wJumptableIndex
 	set 7, [hl]
 	ret
-
-UnownPuzzle_WaitPressAorB:
-.loop
-	call CheckIfAOrBPressed
-	ret nz
-	call DelayFrame
-	jr .loop
 
 UnownPuzzle_InvalidAction:
 	ld de, SFX_WRONG
@@ -535,13 +528,13 @@ RedrawUnownPuzzlePieces:
 .OAM_NotHoldingPiece:
 	dsprite -1, -4, -1, -4, $00, $0
 	dsprite -1, -4,  0, -4, $01, $0
-	dsprite -1, -4,  0,  4, $00, $0 | OAM_XFLIP
+	dsprite -1, -4,  0,  4, $00, $0 | X_FLIP
 	dsprite  0, -4, -1, -4, $02, $0
 	dsprite  0, -4,  0, -4, $03, $0
-	dsprite  0, -4,  0,  4, $02, $0 | OAM_XFLIP
-	dsprite  0,  4, -1, -4, $00, $0 | OAM_YFLIP
-	dsprite  0,  4,  0, -4, $01, $0 | OAM_YFLIP
-	dsprite  0,  4,  0,  4, $00, $0 | OAM_XFLIP | OAM_YFLIP
+	dsprite  0, -4,  0,  4, $02, $0 | X_FLIP
+	dsprite  0,  4, -1, -4, $00, $0 | Y_FLIP
+	dsprite  0,  4,  0, -4, $01, $0 | Y_FLIP
+	dsprite  0,  4,  0,  4, $00, $0 | X_FLIP | Y_FLIP
 	db -1
 
 UnownPuzzleCoordData:

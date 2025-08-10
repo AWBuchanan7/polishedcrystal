@@ -61,6 +61,7 @@ AlanFoundItemText:
 
 	para "to "
 	text_ram wStringBuffer5
+	text ""
 	line "and pick it up?"
 	done
 

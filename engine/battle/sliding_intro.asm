@@ -1,20 +1,20 @@
 BattleIntroSlidingPics:
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
-	ld a, BANK(wLYOverrides)
-	ldh [rWBK], a
+	ld a, $5
+	ldh [rSVBK], a
 	call .subfunction1
 	ld hl, rIE
-	set B_IE_STAT, [hl]
+	set LCD_STAT, [hl]
 	ld a, LOW(rSCX)
 	ldh [hLCDCPointer], a
 	call .subfunction2
 	ld hl, rIE
-	res B_IE_STAT, [hl]
+	res LCD_STAT, [hl]
 	xor a
 	ldh [hLCDCPointer], a
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ret
 
 .subfunction1
@@ -33,7 +33,7 @@ BattleIntroSlidingPics:
 	push af
 .loop2
 	ldh a, [rLY]
-	cp $5f
+	cp $60
 	jr nz, .loop2
 	ld a, d
 	ldh [hSCX], a
@@ -44,8 +44,13 @@ BattleIntroSlidingPics:
 	dec d
 	pop af
 	push af
-	dec a
-	call nz, .subfunction3
+	cp $1
+	jr z, .skip1
+	push de
+	call .subfunction3
+	pop de
+
+.skip1
 	call DelayFrame
 	pop af
 	dec a
@@ -53,17 +58,15 @@ BattleIntroSlidingPics:
 	ret
 
 .subfunction3
-	push de
-	ld hl, wShadowOAMSprite00XCoord
+	ld hl, wShadowOAM + 1 ; x pixel
 	ld c, $12 ; 18
-	ld de, OBJ_SIZE
+	ld de, $4
 .loop3
 	dec [hl]
 	dec [hl]
 	add hl, de
 	dec c
 	jr nz, .loop3
-	pop de
 	ret
 
 .subfunction4
@@ -82,13 +85,13 @@ BattleIntroSlidingPics:
 	dec c
 	jr nz, .loop4
 	ld a, e
-	ld c, $21 ; 33
+	ld c, $22 ; 34
 .loop5
 	ld [hli], a
 	dec c
 	jr nz, .loop5
 	xor a
-	ld c, $31 ; 49
+	ld c, $30 ; 48
 .loop6
 	ld [hli], a
 	dec c

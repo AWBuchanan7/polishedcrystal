@@ -17,8 +17,8 @@ ReadAnyMail:
 	call .LoadGFX
 	call EnableLCD
 	call ApplyTilemapInVBlank
-	ld a, CGB_READ_MAIL
-	call GetCGBLayout
+	ld a, [wBuffer3]
+	farcall LoadAndApplyMailPalettes
 	call SetDefaultBGPAndOBP
 	xor a
 	ldh [hJoyPressed], a
@@ -31,7 +31,7 @@ ReadAnyMail:
 .loop
 	call GetJoypad
 	ldh a, [hJoyPressed]
-	and PAD_A | PAD_B
+	and A_BUTTON | B_BUTTON
 	jr z, .loop
 	ret
 
@@ -41,19 +41,23 @@ ReadAnyMail:
 	push hl
 	xor a
 	call GetSRAMBank
-	ld de, sPartyMon1MailSpecies - sPartyMon1Mail
+	ld de, sPartyMon1MailAuthorID - sPartyMon1Mail
 	add hl, de
+	ld a, [hli]
+	ld [wBuffer1], a
+	ld a, [hli]
+	ld [wBuffer2], a
 	ld a, [hli]
 	ld [wCurPartySpecies], a
 	ld b, [hl]
 	call CloseSRAM
 	ld a, b
-	ld [wCurItem], a
 	sub FIRST_MAIL
+	ld [wBuffer3], a
 	pop bc
 	call StackJumpTable
 
-.Jumptable:
+LoadMailGFXJumptable:
 ; entries correspond to mail items
 	table_width 2
 	dw LoadFlowerMailGFX
@@ -348,7 +352,7 @@ LoadBlueSkyMailGFX:
 	ld de, BlueSkyMailGrassGFX
 	ld c, 1 * 8
 	call LoadMailGFX_Color3
-	ld de, MailDragoniteAndSentretGFX
+	ld de, MailDragoniteGFX
 	ld c, 23 * 8
 	call LoadMailGFX_Color3
 	ld de, MailCloudGFX
@@ -619,7 +623,7 @@ MailGFX_PlaceMessage:
 	ld de, wMonOrItemNameBuffer
 	ld bc, NAME_LENGTH - 1
 	rst CopyBytes
-	ld a, '@'
+	ld a, "@"
 	ld [wTempMailAuthor], a
 	ld [wMonOrItemNameBuffer + NAME_LENGTH - 1], a
 	ld de, wTempMailMessage
@@ -629,12 +633,12 @@ MailGFX_PlaceMessage:
 	ld a, [de]
 	and a
 	ret z
-	ld a, [wCurItem]
+	ld a, [wBuffer3]
 	hlcoord 8, 14
-	cp PORTRAITMAIL
+	cp $3 ; PORTRAITMAIL
 	jr z, .place_author
 	hlcoord 6, 14
-	cp MORPH_MAIL
+	cp $6 ; MORPH_MAIL
 	jr z, .place_author
 	hlcoord 5, 14
 

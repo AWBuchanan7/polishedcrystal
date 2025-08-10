@@ -1,5 +1,5 @@
 HueyPhoneScript1:
-	gettrainername SAILOR, HUEY1, STRING_BUFFER_3
+	gettrainername SAILOR, HUEY1, $0
 	checkflag ENGINE_HUEY_READY_FOR_REMATCH
 	iftruefwd .WantsBattle
 	farscall PhoneScript_AnswerPhone_Male
@@ -15,11 +15,11 @@ HueyPhoneScript1:
 	farsjump HueyHangUpScript
 
 .WantsBattle:
-	getlandmarkname LIGHTHOUSE, STRING_BUFFER_5
+	getlandmarkname LIGHTHOUSE, $2
 	farsjump HueyWantsBattleScript
 
 HueyPhoneScript2:
-	gettrainername SAILOR, HUEY1, STRING_BUFFER_3
+	gettrainername SAILOR, HUEY1, $0
 	farscall PhoneScript_GreetPhone_Male
 	checkflag ENGINE_HUEY_READY_FOR_REMATCH
 	iftruefwd .Flavor
@@ -36,6 +36,6 @@ HueyWednesdayNight:
 	setflag ENGINE_HUEY_WEDNESDAY_NIGHT
 
 HueyWantsBattle:
-	getlandmarkname LIGHTHOUSE, STRING_BUFFER_5
+	getlandmarkname LIGHTHOUSE, $2
 	setflag ENGINE_HUEY_READY_FOR_REMATCH
 	farsjump PhoneScript_WantsToBattle_Male

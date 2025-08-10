@@ -1,6 +1,7 @@
 LizAnswerPhoneText:
 	text "Hello, "
 	text_ram wStringBuffer3
+	text ""
 	line "speaking."
 
 	para "Oh, <PLAYER>."
@@ -10,6 +11,7 @@ LizAnswerPhoneText:
 LizAnswerPhoneDayText:
 	text "Hello, "
 	text_ram wStringBuffer3
+	text ""
 	line "speaking."
 
 	para "Oh, <PLAYER>."
@@ -19,6 +21,7 @@ LizAnswerPhoneDayText:
 LizAnswerPhoneNiteText:
 	text "Hello, "
 	text_ram wStringBuffer3
+	text ""
 	line "speaking."
 
 	para "Oh, <PLAYER>."

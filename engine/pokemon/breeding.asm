@@ -365,8 +365,6 @@ HatchEggs:
 	rst CopyBytes
 
 	; This prints "Huh?" and does the egg hatch animation.
-	ld a, TRUE
-	ld [wSpriteUpdatesEnabled], a ; needed so SafeCopyTilemapAtOnceproperly updates textbox palettes when within nickname menu
 	ld hl, .Text_HatchEgg
 	call PrintText
 
@@ -583,15 +581,13 @@ InheritEggMove:
 	ld b, a
 	; bc = index
 	call GetSpeciesAndFormIndex
-	ld hl, EggSpeciesMovesPointers
+	ld hl, EggMovePointers
 	add hl, bc
 	add hl, bc
-	ld a, BANK(EggSpeciesMovesPointers)
+	ld a, BANK(EggMovePointers)
 	call GetFarWord
-	inc hl
-	inc hl
 .loop
-	ld a, BANK(EggSpeciesMoves)
+	ld a, BANK(EggMoves)
 	call GetFarByte
 	inc a
 	ret z
@@ -654,8 +650,8 @@ Hatch_UpdateFrontpicBGMapCenter:
 	push hl
 	push bc
 	hlcoord 0, 0
-	ld bc, SCREEN_AREA
-	ld a, ' '
+	ld bc, SCREEN_HEIGHT * SCREEN_WIDTH
+	ld a, " "
 	rst ByteFill
 	pop bc
 	pop hl
@@ -690,7 +686,7 @@ EggHatch_AnimationSequence:
 	call DisableLCD
 	ld a, CGB_PLAIN
 	call GetCGBLayout
-	ld a, ' '
+	ld a, " "
 	ld bc, vBGMap1 - vBGMap0
 	hlbgcoord 0, 0
 	rst ByteFill
@@ -845,15 +841,15 @@ Hatch_InitShellFragments:
 
 .SpriteData:
 ; Probably OAM.
-	dsprite 10, 4,  9, 0, $00, $4 | OAM_XFLIP
+	dsprite 10, 4,  9, 0, $00, $4 | X_FLIP
 	dsprite 11, 4,  9, 0, $01, $4
-	dsprite 10, 4, 10, 0, $00, $0 | OAM_XFLIP
+	dsprite 10, 4, 10, 0, $00, $0 | X_FLIP
 	dsprite 11, 4, 10, 0, $01, $0
-	dsprite 10, 4, 11, 0, $02, $4 | OAM_XFLIP
+	dsprite 10, 4, 11, 0, $02, $4 | X_FLIP
 	dsprite 11, 4, 11, 0, $03, $4
-	dsprite 10, 0,  9, 4, $00, $6 | OAM_XFLIP
+	dsprite 10, 0,  9, 4, $00, $6 | X_FLIP
 	dsprite 12, 0,  9, 4, $01, $2
-	dsprite 10, 0, 10, 4, $02, $2 | OAM_XFLIP
+	dsprite 10, 0, 10, 4, $02, $2 | X_FLIP
 	dsprite 12, 0, 10, 4, $03, $6
 	db -1
 
@@ -872,7 +868,7 @@ Special_DayCareMon1:
 	ld c, a
 	ld a, [wBreedMon1Form]
 	ld b, a
-	call PlayMonCry
+	call PlayCry
 	ld a, [wDayCareLady]
 	bit 0, a
 	jr z, DayCareMonCursor
@@ -888,7 +884,7 @@ Special_DayCareMon2:
 	ld c, a
 	ld a, [wBreedMon2Form]
 	ld b, a
-	call PlayMonCry
+	call PlayCry
 	ld a, [wDayCareMan]
 	bit 0, a
 	jr z, DayCareMonCursor

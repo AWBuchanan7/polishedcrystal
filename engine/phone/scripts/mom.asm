@@ -14,7 +14,7 @@ MomPhoneScript:
 	iftruefwd MomPhoneHangUpScript
 	farwritetext MomPhoneGreetingText
 	promptbutton
-	getcurlandmarkname STRING_BUFFER_3
+	getcurlandmarkname $0
 	readvar VAR_ENVIRONMENT
 	ifequalfwd TOWN, MomPhoneInTown
 	ifequalfwd ROUTE, MomPhoneOnRoute
@@ -47,13 +47,13 @@ MomPhoneInTown:
 	sjumpfwd MomSavingMoney
 
 .violet
-	getlandmarkname SPROUT_TOWER, STRING_BUFFER_4
+	getlandmarkname SPROUT_TOWER, 1
 	sjump MomPhoneLandmark
 .azalea
-	getlandmarkname SLOWPOKE_WELL, STRING_BUFFER_4
+	getlandmarkname SLOWPOKE_WELL, 1
 	sjump MomPhoneLandmark
 .goldenrod
-	getlandmarkname RADIO_TOWER, STRING_BUFFER_4
+	getlandmarkname RADIO_TOWER, 1
 	sjump MomPhoneLandmark
 
 MomPhoneOnRoute:
@@ -69,17 +69,17 @@ MomPhoneOther:
 MomSavingMoney:
 	checkflag ENGINE_MOM_SAVING_MONEY
 	iffalsefwd .NotSaving
-	checkmoney MOMS_MONEY, 0
-	ifequalfwd HAVE_MORE, .SavingHasMoney
+	checkmoney $1, 0
+	ifequalfwd $0, .SavingHasMoney
 	sjumpfwd .SavingNoMoney
 
 .NotSaving:
-	checkmoney MOMS_MONEY, 0
-	ifequalfwd HAVE_MORE, .HasMoney
+	checkmoney $1, 0
+	ifequalfwd $0, .HasMoney
 	sjumpfwd .NoMoney
 
 .SavingHasMoney:
-	getmoney MOMS_MONEY, STRING_BUFFER_3
+	getmoney $1, $0
 	farwritetext MomCheckBalanceText
 	yesorno
 	iftruefwd MomPhoneSaveMoneyScript
@@ -98,7 +98,7 @@ MomSavingMoney:
 	sjumpfwd MomPhoneWontSaveMoneyScript
 
 .HasMoney:
-	getmoney MOMS_MONEY, STRING_BUFFER_3
+	getmoney $1, $0
 	farwritetext MomYouveSavedText
 	yesorno
 	iftruefwd MomPhoneSaveMoneyScript

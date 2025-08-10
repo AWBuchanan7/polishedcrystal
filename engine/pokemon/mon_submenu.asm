@@ -140,9 +140,11 @@ GetMonSubmenuItems:
 	jr nz, .loop
 
 .skip_moves
-	ld a, MONMENUITEM_SUMMARY
+	ld a, MONMENUITEM_STATS
 	call AddMonMenuItem
 	ld a, MONMENUITEM_SWITCH
+	call AddMonMenuItem
+	ld a, MONMENUITEM_MOVE
 	call AddMonMenuItem
 	ld a, [wLinkMode]
 	and a
@@ -168,7 +170,7 @@ GetMonSubmenuItems:
 	jr TerminateMonSubmenu
 
 .egg
-	ld a, MONMENUITEM_SUMMARY
+	ld a, MONMENUITEM_STATS
 	call AddMonMenuItem
 	ld a, MONMENUITEM_SWITCH
 	call AddMonMenuItem

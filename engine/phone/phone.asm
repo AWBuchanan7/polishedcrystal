@@ -36,6 +36,8 @@ CheckCellNum::
 	xor a
 	ret
 
+INCLUDE "data/phone/permanent_numbers.asm"
+
 CheckPhoneCall::
 ; Check if the phone is ringing in the overworld.
 
@@ -364,10 +366,11 @@ RingTwice_StartCall:
 Phone_CallerTextboxWithName:
 	ld a, [wCurCaller]
 	ld b, a
+Phone_TextboxWithName:
 	push bc
 	call Phone_CallerTextbox
 	hlcoord 1, 1
-	ld a, '<PHONE>'
+	ld a, "<PHONE>"
 	ld [hli], a
 	inc hl
 	ld d, h
@@ -378,25 +381,22 @@ GetCallerClassAndName:
 	ld l, e
 	ld a, b
 	call GetCallerTrainerClass
+GetCallerName:
 	ld a, c
 	and a
 	jr z, .NotTrainer
-	ld [wNamedObjectIndex], a
-	push hl
-	push bc
-	farcall GetTrainerName
-	pop bc
-	pop hl
+
+	call Phone_GetTrainerName
 	push hl
 	push bc
 	rst PlaceString
-	ld a, ':'
+	ld a, ":"
 	ld [bc], a
 	pop bc
 	pop hl
 	ld de, SCREEN_WIDTH + 3
 	add hl, de
-	call GetTrainerClassName
+	call Phone_GetTrainerClassName
 	rst PlaceString
 	ret
 
@@ -431,30 +431,41 @@ Phone_NoSignal:
 	jr Phone_CallEnd
 
 HangUp::
-	ld hl, PhoneClickText
-	call PrintText
-	ld de, SFX_HANG_UP
-	call PlaySFX
-	call Phone_Wait20Frames
-	; fallthrough
+	call HangUp_Beep
+	call HangUp_Wait20Frames
 Phone_CallEnd:
-	call .BoopWaitTextWait
-	call .BoopWaitTextWait
-	; fallthrough
-.BoopWaitTextWait:
-	ld hl, PhoneEllipseText
-	call PrintText
-	call Phone_Wait20Frames
+	call HangUp_BoopOn
+	call HangUp_Wait20Frames
+	call SpeechTextbox
+	call HangUp_Wait20Frames
+	call HangUp_BoopOn
+	call HangUp_Wait20Frames
+	call SpeechTextbox
+	call HangUp_Wait20Frames
+	call HangUp_BoopOn
+	call HangUp_Wait20Frames
 	call SpeechTextbox
 	; fallthrough
+
+HangUp_Wait20Frames:
 Phone_Wait20Frames:
 	ld c, 20
 	call DelayFrames
 	jmp ApplyTilemap
 
+HangUp_Beep:
+	ld hl, PhoneClickText
+	call PrintText
+	ld de, SFX_HANG_UP
+	jmp PlaySFX
+
 PhoneClickText:
 	text_far _PhoneClickText
 	text_end
+
+HangUp_BoopOn:
+	ld hl, PhoneEllipseText
+	jmp PrintText
 
 PhoneEllipseText:
 	text_far _PhoneEllipseText
@@ -497,6 +508,22 @@ GetCallerTrainerClass:
 	ld a, [hli]
 	ld b, [hl]
 	ld c, a
+	pop hl
+	ret
+
+Phone_GetTrainerName:
+	push hl
+	push bc
+	farcall GetTrainerName
+	pop bc
+	pop hl
+	ret
+
+Phone_GetTrainerClassName:
+	push hl
+	push bc
+	farcall GetTrainerClassName
+	pop bc
 	pop hl
 	ret
 

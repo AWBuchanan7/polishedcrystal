@@ -21,7 +21,7 @@ BillPhoneScript1:
 	farwritetext BillPhoneGenericText
 	promptbutton
 	readvar VAR_BOXSPACE
-	getnum STRING_BUFFER_3
+	getnum $0
 	ifequalfwd $0, .full
 	ifless $6, .nearlyfull
 	farwritetext BillPhoneNotFullText

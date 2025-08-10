@@ -13,15 +13,15 @@ ResetGameTime::
 	ret
 
 GameTimer::
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, 1
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	call UpdateGameTimer
 
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ret
 
 UpdateGameTimer::

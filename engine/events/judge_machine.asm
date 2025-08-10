@@ -198,22 +198,14 @@ JudgeSystem::
 
 ; Place the Pokédex number
 	ld a, [wCurPartySpecies]
-	ld c, a
-	ld a, [wCurForm]
-	ld b, a
-	call GetPokedexNumber
-	ld de, wTextDecimalByte+1
-	ld a, c
-	ld [de], a
-	dec de
-	ld a, b
-	ld [de], a
+	ld [wTextDecimalByte], a
 	hlcoord 1, 13
-	ld a, '№'
+	ld a, "№"
 	ld [hli], a
-	ld a, '.'
+	ld a, "."
 	ld [hli], a
-	lb bc, PRINTNUM_LEADINGZEROS | 2, 3
+	lb bc, PRINTNUM_LEADINGZEROS | 1, 3
+	ld de, wTextDecimalByte
 	call PrintNum
 
 ; Place the chart
@@ -319,15 +311,15 @@ JudgeSystem::
 	call JoyTextDelay
 	ldh a, [hJoyLast]
 	; B button quits
-	bit B_PAD_B, a
+	bit B_BUTTON_F, a
 	ret nz
 	; Up or down switches between party members
-	bit B_PAD_UP, a
+	bit D_UP_F, a
 	jr nz, .prev_mon
-	bit B_PAD_DOWN, a
+	bit D_DOWN_F, a
 	jr nz, .next_mon
 	; Left or right toggles between EVs and IVs
-	and PAD_LEFT | PAD_RIGHT
+	and D_LEFT | D_RIGHT
 	jr z, .input_loop
 	ldh a, [hChartScreen]
 	cpl
@@ -555,10 +547,10 @@ RenderChart:
 	call FarDecompressWRA6InB
 ; Render the radar chart onto the graphics
 	ld a, BANK(wDecompressScratch)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	call OutlineRadarChart
 	ld a, $1
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ret
 
 CalcBTimesCOver256:

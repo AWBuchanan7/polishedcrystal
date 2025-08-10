@@ -98,7 +98,7 @@ DoPoisonStep::
 	or a
 	jr nz, .DoPoisonDamage
 	ld a, c
-	dec a
+	cp 1
 	jr nz, .DoPoisonDamage
 
 ; if 1 HP, heal poison

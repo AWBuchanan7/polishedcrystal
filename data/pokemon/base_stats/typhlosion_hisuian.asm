@@ -8,9 +8,9 @@
 	dn GENDER_F12_5, HATCH_MEDIUM_FAST ; gender ratio, step cycles to hatch
 
 if DEF(FAITHFUL)
-	abilities_for TYPHLOSION_HISUIAN, BLAZE, BLAZE, FRISK
+	abilities_for TYPHLOSION_HISUIAN, BLAZE, BLAZE, FLASH_FIRE
 else
-	abilities_for TYPHLOSION_HISUIAN, BLAZE, FLAME_BODY, FRISK
+	abilities_for TYPHLOSION_HISUIAN, BLAZE, FLAME_BODY, FLASH_FIRE
 endc
 	db GROWTH_MEDIUM_SLOW ; growth rate
 	dn EGG_NONE, EGG_NONE ; egg groups

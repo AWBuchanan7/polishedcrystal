@@ -23,7 +23,9 @@ QueueBattleAnimation:
 	ld b, h
 	ld hl, wLastAnimObjectIndex
 	inc [hl]
+	; fallthrough
 
+InitBattleAnimation:
 	ld hl, wBattleAnimTemp0
 	ld e, [hl]
 	; d was set to 0 or 1 previously
@@ -115,7 +117,7 @@ BattleAnimOAMUpdate:
 	push hl
 	ld a, [hl]
 	ld hl, wBattleAnimTempOAMFlags
-	bit B_OAM_YFLIP, [hl]
+	bit OAM_Y_FLIP, [hl]
 	jr z, .no_yflip
 	add $8
 	cpl
@@ -135,7 +137,7 @@ BattleAnimOAMUpdate:
 	push hl
 	ld a, [hl]
 	ld hl, wBattleAnimTempOAMFlags
-	bit B_OAM_XFLIP, [hl]
+	bit OAM_X_FLIP, [hl]
 	jr z, .no_xflip
 	add $8
 	cpl
@@ -217,7 +219,7 @@ BattleAnimOAMUpdate:
 	; First, set XY flip.
 	ld a, [hli]
 	jr z, .no_priority
-	or OAM_PRIO
+	or PRIORITY
 .no_priority
 	push hl
 	ld hl, wBattleAnimTempOAMFlags
@@ -233,14 +235,14 @@ BattleAnimOAMUpdate:
 	ret
 
 .tile_data
-	db OAM_XFLIP, $00 ; W
-	db OAM_XFLIP, $08 ; NW
-	db OAM_YFLIP, $04 ; N
+	db X_FLIP, $00 ; W
+	db X_FLIP, $08 ; NW
+	db Y_FLIP, $04 ; N
 	db 0, $08 ; NE
-	db OAM_YFLIP, $00 ; E
-	db OAM_YFLIP, $08 ; SE
-	db OAM_XFLIP, $04 ; S
-	db OAM_XFLIP | OAM_YFLIP, $08 ; SW
+	db Y_FLIP, $00 ; E
+	db Y_FLIP, $08 ; SE
+	db X_FLIP, $04 ; S
+	db X_FLIP | Y_FLIP, $08 ; SW
 
 InitBattleAnimBuffer:
 	ld hl, BATTLEANIMSTRUCT_OAMFLAGS

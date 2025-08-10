@@ -1,7 +1,7 @@
 HiddenItemScript:
 	opentext
 	readmem wHiddenItemID
-	getitemname USE_SCRIPT_VAR, STRING_BUFFER_3
+	getitemname STRING_BUFFER_3, USE_SCRIPT_VAR
 	farwritetext _FoundItemText
 	giveitem ITEM_FROM_MEM
 	iffalsefwd .bag_full

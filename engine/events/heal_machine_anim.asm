@@ -120,10 +120,10 @@ HealMachineAnim:
 	ret
 
 .FlashPalettes:
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, $5
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	ld hl, wOBPals2 palette 7
 	ld a, [hli]
@@ -155,7 +155,7 @@ HealMachineAnim:
 	ld [hl], a
 
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ld a, $1
 	ldh [hCGBPalUpdate], a
 	ret
@@ -164,7 +164,7 @@ HealMachineAnim:
 	push bc
 	ld a, [wBuffer1]
 	bcpixel 2, 4
-	dec a ; ElmsLab = 1
+	cp $1 ; ElmsLab
 	jr z, .okay
 	bcpixel 0, 0
 
@@ -190,11 +190,11 @@ HealMachineAnim:
 	dsprite   4, 0,   4, 2, $78, 7
 	dsprite   4, 0,   4, 6, $78, 7
 	dsprite   4, 6,   4, 0, $79, 7
-	dsprite   4, 6,   5, 0, $79, 7 | OAM_XFLIP
+	dsprite   4, 6,   5, 0, $79, 7 | X_FLIP
 	dsprite   5, 3,   4, 0, $79, 7
-	dsprite   5, 3,   5, 0, $79, 7 | OAM_XFLIP
+	dsprite   5, 3,   5, 0, $79, 7 | X_FLIP
 	dsprite   6, 0,   4, 0, $79, 7
-	dsprite   6, 0,   5, 0, $79, 7 | OAM_XFLIP
+	dsprite   6, 0,   5, 0, $79, 7 | X_FLIP
 
 .HOF_OAM:
 	dsprite   7, 4,  10, 1, $79, 7

@@ -24,7 +24,7 @@ _MemoryGame:
 	ld [hli], a
 	ld [hl], $0
 	hlcoord 0, 0
-	ld bc, SCREEN_AREA
+	ld bc, SCREEN_HEIGHT * SCREEN_WIDTH
 	xor a
 	rst ByteFill
 	xor a
@@ -116,7 +116,7 @@ endr
 .CheckTriesRemaining:
 	ld a, [wMemoryGameNumberTriesRemaining]
 	hlcoord 17, 0
-	add '0'
+	add "0"
 	ld [hl], a
 	ld hl, wMemoryGameNumberTriesRemaining
 	ld a, [hl]
@@ -197,7 +197,7 @@ endr
 
 .RevealAll:
 	ldh a, [hJoypadPressed]
-	and PAD_A
+	and A_BUTTON
 	ret z
 	xor a
 	ld [wMemoryGameCounter], a
@@ -441,7 +441,7 @@ MemoryGame_DeleteCard:
 
 MemoryGame_InitStrings:
 	hlcoord 0, 0
-	ld bc, SCREEN_AREA
+	ld bc, SCREEN_WIDTH * SCREEN_HEIGHT
 	ld a, $1
 	rst ByteFill
 	hlcoord 0, 0
@@ -491,19 +491,19 @@ MemoryGame_InterpretJoypad_AnimateCursor:
 	call JoyTextDelay
 	ld hl, hJoypadPressed
 	ld a, [hl]
-	and PAD_A
+	and A_BUTTON
 	jr nz, .pressed_a
 	ld a, [hl]
-	and PAD_LEFT
+	and D_LEFT
 	jr nz, .pressed_left
 	ld a, [hl]
-	and PAD_RIGHT
+	and D_RIGHT
 	jr nz, .pressed_right
 	ld a, [hl]
-	and PAD_UP
+	and D_UP
 	jr nz, .pressed_up
 	ld a, [hl]
-	and PAD_DOWN
+	and D_DOWN
 	jr nz, .pressed_down
 	ret
 

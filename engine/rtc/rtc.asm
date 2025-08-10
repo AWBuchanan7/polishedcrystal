@@ -1,13 +1,17 @@
 ; get time of day based on the current hour
 GetTimeOfDay::
-	ld hl, .TimesOfDay
-	call GetValueByTimeOfDay
+	ld hl, TimesOfDay
+	call GetHourIntervalValue
 	ld [wTimeOfDay], a
 	ret
 
 ; hours for the time of day
-.TimesOfDay:
-	db MORN, DAY, EVE, NITE
+TimesOfDay:
+	db MORN_HOUR, NITE
+	db DAY_HOUR,  MORN
+	db EVE_HOUR,  DAY
+	db NITE_HOUR, EVE
+	db -1,        NITE
 
 StageRTCTimeForSave:
 	call UpdateTime
@@ -25,7 +29,7 @@ StageRTCTimeForSave:
 SaveRTC:
 	; enable SRAM/RTC hardware
 	ld a, $a
-	ld [rRAMG], a
+	ld [MBC3SRamEnable], a
 
 ; do not talk to the RTC hardware in the no-RTC patch
 	ld a, [wInitialOptions2]
@@ -34,17 +38,17 @@ SaveRTC:
 	; pulse the RTC to get its value
 	call LatchClock
 	; set the MBC3 register to the RTC day high byte & status flags
-	ld hl, rRTCREG
+	ld hl, MBC3RTC
 	ld a, $c
 	; read the value from the hardware
-	ld [rRAMB], a
+	ld [MBC3SRamBank], a
 	; clear clock overflow bit
 	res 7, [hl]
 .no_rtc
 
 	; select the SRAM bank for the saved RTC status flags
 	ld a, BANK(sRTCStatusFlags)
-	ld [rRAMB], a
+	ld [MBC3SRamBank], a
 	; clear the SRAM RTC status flags
 	xor a
 	ld [sRTCStatusFlags], a
@@ -66,20 +70,20 @@ StartClock::
 	; start the RTC hardware running
 	; it will continue to count time passing while the GameBoy is off
 	; turn on the SRAM, where the RTC hardware is also located
-	ld a, RAMG_SRAM_ENABLE
-	ld [rRAMG], a
+	ld a, SRAM_ENABLE
+	ld [MBC3SRamEnable], a
 	; enable the RTC hardware
 	call LatchClock
 	; the control flags for the RTC hardware are in the top bits of the
 	; topmost value (the high-byte of the day count);
 	; tell the MBC3 mapper to select this value for read/write
-	ld a, RAMB_RTC_DH
-	ld [rRAMB], a
+	ld a, RTC_DH
+	ld [MBC3SRamBank], a
 	; read the value of the days count high byte
-	ld a, [rRTCREG]
+	ld a, [MBC3RTC]
 	; activate the clock hardware by setting bit 6 to zero
 	res 6, a
-	ld [rRTCREG], a
+	ld [MBC3RTC], a
 	; remember to switch off the SRAM
 	jmp CloseSRAM
 

@@ -109,9 +109,9 @@ DoCelebiEvent:
 	push de
 
 	ldh a, [hUsedOAMIndex]
-	; a = (OAM_COUNT - 4) * OBJ_SIZE - a
+	; a = (NUM_SPRITE_OAM_STRUCTS - 4) * SPRITEOAMSTRUCT_LENGTH - a
 	cpl
-	add (OAM_COUNT - 4) * OBJ_SIZE + 1
+	add (NUM_SPRITE_OAM_STRUCTS - 4) * SPRITEOAMSTRUCT_LENGTH + 1
 
 	ld [wCurSpriteOAMAddr], a
 	farcall DoNextFrameForAllSprites_OW

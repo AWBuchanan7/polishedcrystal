@@ -39,7 +39,7 @@ JoeyPhoneFullText:
 	line "phone's full."
 	done
 
-JoeyTopPercentageText: ; TODO: use this text from HGSS
+JoeyTopPercentageText:
 	text "Hey, do you remem-"
 	line "ber my super cool"
 	cont ""

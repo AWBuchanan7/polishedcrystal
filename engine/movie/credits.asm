@@ -13,10 +13,10 @@ Credits::
 .okay
 	ld [wJumptableIndex], a
 
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wDecompressedCreditsGFX)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	call ClearBGPalettes
 	call ClearTileMap
@@ -56,7 +56,7 @@ Credits::
 	rst ByteFill
 
 	ld hl, rIE
-	set B_IE_STAT, [hl]
+	set LCD_STAT, [hl]
 	ld a, LOW(rSCX)
 	ldh [hLCDCPointer], a
 
@@ -87,19 +87,19 @@ Credits::
 .exit_credits
 	call ClearBGPalettes
 	ld hl, rIE
-	res B_IE_STAT, [hl]
+	res LCD_STAT, [hl]
 	xor a
 	ldh [hLCDCPointer], a
 	ldh [hBGMapAddress], a
 	pop af
 	ldh [hVBlank], a
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ret
 
 Credits_HandleAButton:
 	ldh a, [hJoypadDown]
-	and PAD_A
+	and A_BUTTON
 	ret z
 	ld a, [wJumptableIndex]
 	bit 7, a
@@ -107,7 +107,7 @@ Credits_HandleAButton:
 
 Credits_HandleBButton:
 	ldh a, [hJoypadDown]
-	and PAD_B
+	and B_BUTTON
 	ret z
 	ld a, [wJumptableIndex]
 	bit 6, a
@@ -227,7 +227,7 @@ ParseCredits:
 	ldh [hBGMapMode], a
 	hlcoord 0, 5
 	ld bc, 20 * 12
-	ld a, ' '
+	ld a, " "
 	rst ByteFill
 
 ; Then read the script.
@@ -391,7 +391,7 @@ ConstructCreditsTilemap:
 
 	ld a, $28
 	hlcoord 0, 0
-	ld bc, SCREEN_AREA
+	ld bc, SCREEN_HEIGHT * SCREEN_WIDTH
 	rst ByteFill
 
 	ld a, $7f
@@ -478,14 +478,14 @@ GetCreditsPalette:
 	call .GetPalAddress
 
 	push hl
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wBGPals1)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	xor a
 	call .UpdatePals
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	pop hl
 	ret
 

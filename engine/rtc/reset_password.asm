@@ -14,7 +14,7 @@ _ResetClock:
 	call VerticalMenu
 	ret c
 	ld a, [wMenuCursorY]
-	dec a
+	cp $1
 	ret z
 	ld a, BANK(sRTCStatusFlags)
 	call GetSRAMBank

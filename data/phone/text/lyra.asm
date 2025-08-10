@@ -64,10 +64,7 @@ LyraPhoneNextMoveLevelText:
 	line "learns its next"
 	cont "move at level "
 	text_decimal hScriptVar, 1, 3
-	text ":"
-	cont ""
-	text_ram wStringBuffer1
-	text "!"
+	text "."
 	prompt
 
 LyraPhoneNoNextMoveText:
@@ -137,8 +134,9 @@ LyraPhoneSpecialText_FirstBadge:
 	line "you, <PLAYER>."
 
 	para "Oh, you got your"
-	line "first Badge in"
-	cont "Kanto? Good going!"
+	line "first badge in"
+	cont "Kanto too?"
+	cont "Good going!"
 
 	para "Let's both keep on"
 	line "winning Badges."

@@ -16,6 +16,7 @@ JoeyDefeatedMonText:
 	text "Oh yeah, I took"
 	line "down a "
 	text_ram wStringBuffer4
+	text ""
 
 	para "in the wild the"
 	line "other day."

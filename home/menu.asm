@@ -287,6 +287,8 @@ GetYesNoBoxPosition:
 NoYesBox:
 ; Returns c (no) or nc (yes). Doesn't mess with menu cursor.
 	call GetYesNoBoxPosition
+	; fallthrough
+PlaceNoYesBox:
 	ld hl, NoYesMenuDataHeader
 	call HandleYesNoMenu
 	ret c
@@ -313,7 +315,7 @@ ClearSpritesUnderYesNoBox:
 	ld de, wShadowOAMSprite00
 	ld h, d
 	ld l, e
-	ld c, OAM_COUNT
+	ld c, NUM_SPRITE_OAM_STRUCTS
 .loop
 	; Check if YCoord >= 8 * TILE_WIDTH + 1
 	ld a, [hli]
@@ -325,7 +327,7 @@ ClearSpritesUnderYesNoBox:
 	jr nc, .clear_sprite
 ; fallthrough
 .next
-	ld hl, OBJ_SIZE
+	ld hl, SPRITEOAMSTRUCT_LENGTH
 	add hl, de
 	ld e, l
 	dec c
@@ -518,13 +520,13 @@ InitMenuCursorAndButtonPermissions::
 	ld a, [wMenuDataFlags]
 	bit 3, a
 	jr z, .disallow_select
-	set B_PAD_START, [hl]
+	set START_F, [hl]
 .disallow_select
 	ld a, [wMenuDataFlags]
 	bit 2, a
 	ret z
-	set B_PAD_LEFT, [hl]
-	set B_PAD_RIGHT, [hl]
+	set D_LEFT_F, [hl]
+	set D_RIGHT_F, [hl]
 	ret
 
 ReadMenuJoypad::
@@ -540,29 +542,29 @@ GetStaticMenuJoypad::
 	call DoMenuJoypadLoop
 
 ContinueGettingMenuJoypad:
-	bit B_PAD_A, a
+	bit A_BUTTON_F, a
 	jr nz, .a_button
-	bit B_PAD_B, a
+	bit B_BUTTON_F, a
 	jr nz, .b_start
-	bit B_PAD_START, a
+	bit START_F, a
 	jr nz, .b_start
-	bit B_PAD_RIGHT, a
+	bit D_RIGHT_F, a
 	jr nz, .d_right
-	bit B_PAD_LEFT, a
+	bit D_LEFT_F, a
 	jr nz, .d_left
 	xor a
 	jr .done
 
 .d_right
-	ld a, PAD_RIGHT
+	ld a, D_RIGHT
 	jr .done
 
 .d_left
-	ld a, PAD_LEFT
+	ld a, D_LEFT
 	jr .done
 
 .a_button
-	ld a, PAD_A
+	ld a, A_BUTTON
 
 .done
 	ld [wMenuJoypad], a
@@ -579,7 +581,7 @@ ContinueGettingMenuJoypad:
 	ret
 
 .b_start
-	ld a, PAD_B
+	ld a, B_BUTTON
 	ld [wMenuJoypad], a
 	ld a, -1
 	ld [wMenuSelection], a
@@ -641,10 +643,10 @@ ClearWindowData::
 	ld hl, w2DMenuData
 	call .bytefill
 
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, $7
-	ldh [rWBK], a
+	ldh [rSVBK], a
 
 	xor a
 	ld hl, wWindowStackBottom
@@ -656,7 +658,7 @@ ClearWindowData::
 	ld [wWindowStackPointer + 1], a
 
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ret
 
 .bytefill
@@ -676,7 +678,7 @@ DoNthMenu::
 	call GetMenuJoypad
 MenuClickSound::
 	push af
-	and PAD_A | PAD_B
+	and A_BUTTON | B_BUTTON
 	jr z, .nosound
 	ld hl, wMenuFlags
 	bit 3, [hl]
@@ -728,10 +730,10 @@ GetMenuJoypad::
 	push bc
 	push af
 	ldh a, [hJoyPressed]
-	and PAD_BUTTONS
+	and BUTTONS
 	ld b, a
 	ldh a, [hJoyLast]
-	and PAD_CTRL_PAD
+	and D_PAD
 	or b
 	ld b, a
 	pop af
@@ -744,7 +746,7 @@ PlaceHollowCursor::
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	ld [hl], '▷'
+	ld [hl], "▷"
 	ret
 
 HideCursor::
@@ -752,5 +754,5 @@ HideCursor::
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	ld [hl], ' '
+	ld [hl], " "
 	ret

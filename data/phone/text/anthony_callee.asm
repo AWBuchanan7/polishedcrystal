@@ -32,6 +32,7 @@ AnthonyGreetText:
 
 	para "This is "
 	text_ram wStringBuffer3
+	text ""
 	line "the Hiker!"
 	done
 
@@ -41,6 +42,7 @@ AnthonyGreetDayText:
 
 	para "This is "
 	text_ram wStringBuffer3
+	text ""
 	line "the Hiker!"
 	done
 
@@ -50,6 +52,7 @@ AnthonyGreetNiteText:
 
 	para "This is "
 	text_ram wStringBuffer3
+	text ""
 	line "the Hiker!"
 	done
 

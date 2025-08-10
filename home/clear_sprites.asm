@@ -9,9 +9,9 @@ ClearSprites::
 ClearNormalSprites::
 	ldh a, [hUsedOAMIndex]
 	ld c, a
-	; a = OAM_SIZE - a
+	; a = (NUM_SPRITE_OAM_STRUCTS * SPRITEOAMSTRUCT_LENGTH) - a
 	cpl
-	add OAM_SIZE + 1
+	add NUM_SPRITE_OAM_STRUCTS * SPRITEOAMSTRUCT_LENGTH + 1
 	ld h, HIGH(wShadowOAM)
 	ld l, a
 	xor a
@@ -22,9 +22,9 @@ ClearNormalSprites::
 HideSprites::
 ; Set all OAM y-positions to 160 to hide them offscreen
 	ld hl, wShadowOAM
-	ld b, OAM_COUNT
+	ld b, NUM_SPRITE_OAM_STRUCTS
 HideSpritesInRange::
-	ld de, OBJ_SIZE
+	ld de, SPRITEOAMSTRUCT_LENGTH
 	ld a, OAM_YCOORD_HIDDEN
 .loop
 	ld [hl], a
@@ -38,7 +38,7 @@ HidePlayerSprite::
 	ld h, HIGH(wShadowOAM)
 	ld a, [wPlayerCurrentOAMSlot]
 	ld l, a
-	ld de, OBJ_SIZE
+	ld de, SPRITEOAMSTRUCT_LENGTH
 	ld b, 4
 	ld a, OAM_YCOORD_HIDDEN
 .loop
@@ -53,28 +53,28 @@ FadeToMenu_BackupSprites::
 	call FadeToMenu
 BackupSprites::
 ; Copy wShadowOAM to wShadowOAMBackup
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wShadowOAMBackup)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ld hl, wShadowOAM
 	ld de, wShadowOAMBackup
 	ld bc, wShadowOAMEnd - wShadowOAM
 	rst CopyBytes
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ret
 
 RestoreSprites::
 	; Copy wShadowOAMBackup to wShadowOAM
-	ldh a, [rWBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wShadowOAMBackup)
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ld hl, wShadowOAMBackup
 	ld de, wShadowOAM
 	ld bc, wShadowOAMEnd - wShadowOAM
 	rst CopyBytes
 	pop af
-	ldh [rWBK], a
+	ldh [rSVBK], a
 	ret
