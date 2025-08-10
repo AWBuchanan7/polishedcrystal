@@ -32,7 +32,7 @@ NewBarkTown_MapScriptHeader:
 	object_event  1,  6, SPRITE_LYRA, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, ObjectEvent, EVENT_LYRA_NEW_BARK_TOWN
 	object_event  6,  8, SPRITE_POKEFAN_F, SPRITEMOVEDATA_SPINRANDOM_SLOW, 0, 0, -1, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, 0, NewBarkTownTeacherScript, -1
 	object_event 13,  8, SPRITE_FAT_GUY, SPRITEMOVEDATA_WALK_UP_DOWN, 1, 0, -1, -1, PAL_NPC_GREEN, OBJECTTYPE_COMMAND, jumptextfaceplayer, Text_ElmDiscoveredNewMon, -1
-	object_event  7, 15, SPRITE_SCHOOLBOY, SPRITEMOVEDATA_WALK_LEFT_RIGHT, 0, 1, -1, (1 << MORN) | (1 << DAY), 0, OBJECTTYPE_COMMAND, jumptextfaceplayer, Text_GearIsImpressive, -1
+	object_event  7, 15, SPRITE_SCHOOLBOY, SPRITEMOVEDATA_WALK_LEFT_RIGHT, 0, 1, -1, (1 << MORN) | (1 << DAY), 0, OBJECTTYPE_COMMAND, jumptextfaceplayer, Text_MonAreWarm, -1
 
 	object_const_def
 	const NEWBARKTOWN_RIVAL
@@ -235,12 +235,13 @@ Movement_LyraSaysGoodbye3_NBT:
 	step_down
 	step_end
 
-Text_GearIsImpressive:
-	text "Wow, your #gear"
-	line "is impressive!"
+Text_MonAreWarm:
+	text "Just another"
+	line "snowy day!"
 
-	para "Did your mom get"
-	line "it for you?"
+	para "Make sure your"
+	line "#mon are kept"
+	cont "warm too!"
 	done
 
 Text_RefreshingBreeze:
