@@ -54,11 +54,12 @@ SetCurrentWeather::
 	ret
 
 .not_overcast
-	ld a, [wMapGroup]
-	cp GROUP_SNOWTOP_MOUNTAIN_OUTSIDE
-	jr nz, .not_snowing
 	ld a, [wMapNumber]
 	cp MAP_SNOWTOP_MOUNTAIN_OUTSIDE
+	jr z, .snowing
+	cp MAP_NEW_BARK_TOWN
+	jr z, .snowing
+	cp MAP_ROUTE_30
 	jr z, .snowing
 	cp MAP_SNOWTOP_MOUNTAIN_INSIDE
 	jr nz, .not_snowing
